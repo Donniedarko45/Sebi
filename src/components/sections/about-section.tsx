@@ -6,7 +6,7 @@ import { FadeIn } from "@/components/ui/fade-in";
 
 export function AboutSection() {
   return (
-    <section className="py-20 bg-white">
+    <section className="py-20 bg-background">
       <div className="container mx-auto px-4">
         <div className="flex flex-col lg:flex-row items-center gap-12">
           <FadeIn className="lg:w-1/2 space-y-6" direction="right">

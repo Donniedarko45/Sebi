@@ -173,55 +173,97 @@ export function Navbar() {
             </button>
           </div>
         </div>
-
-        {/* Mobile Menu Dropdown */}
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="xl:hidden absolute top-full left-0 right-0 mt-4 mx-4 p-4 rounded-2xl bg-white/90 dark:bg-gray-950/90 backdrop-blur-xl border border-gray-200 dark:border-gray-800 shadow-xl flex flex-col gap-2"
-          >
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className={`px-4 py-3 rounded-xl text-xs font-bold transition-colors ${
-                  pathname === link.href
-                    ? "bg-primary/10 text-primary dark:bg-white/10 dark:text-white"
-                    : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400"
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
-            <div className="h-px bg-gray-200 dark:bg-gray-800 my-2" />
-            {isAuthenticated ? (
-              <div className="flex flex-col gap-2">
-                <UserMenu />
-              </div>
-            ) : (
-              <div className="flex flex-col gap-2">
-                <Link
-                  href="/login"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="px-4 py-3 rounded-xl text-xs font-bold text-center hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 transition-colors"
-                >
-                  Log In
-                </Link>
-                <Link
-                  href="/signup"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="px-4 py-3 rounded-xl text-xs font-bold text-center bg-primary text-white shadow-lg shadow-primary/20"
-                >
-                  Get Started
-                </Link>
-              </div>
-            )}
-          </motion.div>
-        )}
       </div>
+
+      {/* Mobile Menu Backdrop & Drawer */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="xl:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+            />
+
+            {/* Drawer */}
+            <motion.div
+              initial={{ x: "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="xl:hidden fixed top-0 left-0 bottom-0 w-3/4 max-w-xs bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl border-r border-gray-200 dark:border-gray-800 shadow-2xl z-50 overflow-y-auto p-6 flex flex-col gap-4"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <Link
+                  href="/"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center gap-2 font-black text-xl tracking-tighter text-transparent bg-clip-text bg-linear-to-r from-primary to-blue-600 dark:from-blue-400 dark:to-blue-200"
+                >
+                  <Image
+                    src="/images/Ashwini SD.png"
+                    alt="Ashwini SD Logo"
+                    width={32}
+                    height={32}
+                    className="w-8 h-8 object-contain"
+                  />
+                  Ashwini SD
+                </Link>
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+
+              <nav className="flex flex-col gap-2">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${
+                      pathname === link.href
+                        ? "bg-primary/10 text-primary dark:bg-white/10 dark:text-white"
+                        : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </nav>
+
+              <div className="h-px bg-gray-200 dark:bg-gray-800 my-2" />
+
+              {isAuthenticated ? (
+                <div className="flex flex-col gap-2">
+                  <UserMenu />
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  <Link
+                    href="/login"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="px-4 py-3 rounded-xl text-sm font-bold text-center border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-300 transition-colors"
+                  >
+                    Log In
+                  </Link>
+                  <Link
+                    href="/signup"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="px-4 py-3 rounded-xl text-sm font-bold text-center bg-primary text-white shadow-lg shadow-primary/20 hover:bg-primary/90 transition-colors"
+                  >
+                    Get Started
+                  </Link>
+                </div>
+              )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
