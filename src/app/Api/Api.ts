@@ -104,10 +104,16 @@ export const WorkshopsApi = {
     request(`/workshops/${workshopId}/register`, "POST", data),
 };
 
+// Subscriptions API
+export const SubscriptionsApi = {
+  initSubscription: (planId: string) => request("/api/subscriptions/init", "POST", { planId }),
+  getCurrentSubscription: () => request("/api/subscriptions/current", "GET"),
+};
+
 // Payment API
 export const PaymentApi = {
-  createOrder: (data: any) => request("/payment/create-order", "POST", data),
-  verifyPayment: (data: any) => request("/payment/verify", "POST", data),
+  createOrder: (subscriptionId: string) => request("/api/payments/create-order", "POST", { subscriptionId }),
+  verifyPayment: (data: any) => request("/api/payment/verify", "POST", data),
 };
 
 // General/Other APIs reflecting the file structure
@@ -130,6 +136,7 @@ export default {
   Plans: PlansApi,
   Courses: CoursesApi,
   Workshops: WorkshopsApi,
+  Subscriptions: SubscriptionsApi,
   Payment: PaymentApi,
   Service: ServiceApi,
   Blog: BlogApi,

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Check, ArrowRight } from "lucide-react";
 
 interface PricingCardProps {
+  planId?: string;
   planName: string;
   duration: string;
   price: string;
@@ -11,6 +12,7 @@ interface PricingCardProps {
 }
 
 export function PricingCard({
+  planId,
   planName,
   duration,
   price,
@@ -76,7 +78,7 @@ export function PricingCard({
         <Link
           href={`/payment?plan=${encodeURIComponent(
             planName,
-          )}&price=${encodeURIComponent(price)}`}
+          )}&price=${encodeURIComponent(price)}&planId=${encodeURIComponent(planId || "")}`}
           className="flex items-center justify-center w-full px-4 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 group-hover:shadow-primary/30"
         >
           Select Plan <ArrowRight className="w-4 h-4 ml-2" />

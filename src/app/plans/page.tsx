@@ -87,10 +87,11 @@ const mockPlans = [
 ];
 
 const mapPlanToCardProps = (plan: any) => ({
-  planName: plan.planName || plan.title || "Unknown Plan",
-  duration: plan.duration || "N/A",
-  price: plan.price || "Contact for Price",
-  servicesIncluded: plan.servicesIncluded || plan.features || [],
+  planId: plan.id || plan.planId,
+  planName: plan.name || plan.planName || plan.title || "Unknown Plan",
+  duration: plan.duration || `${plan.durationMonths} Month${plan.durationMonths > 1 ? 's' : ''}` || "N/A",
+  price: plan.price ? (typeof plan.price === 'string' && plan.price.startsWith('₹') ? plan.price : `₹${plan.price}`) : "Contact for Price",
+  servicesIncluded: plan.servicesIncluded || plan.features || (plan.description ? [plan.description] : []),
   deliveryMode: plan.deliveryMode || "Standard",
   riskDisclaimer: plan.riskDisclaimer,
 });
