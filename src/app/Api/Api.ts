@@ -83,10 +83,10 @@ export const ContactApi = {
 
 // Plans/Subscription API
 export const PlansApi = {
-  getAllPlans: () => request("/plans", "GET"),
-  getPlanById: (id: string) => request(`/plans/${id}`, "GET"),
+  getAllPlans: () => request("/api/plans", "GET"),
+  getPlanById: (id: string) => request(`/api/plans/${id}`, "GET"),
   subscribe: (planId: string, data: any) =>
-    request(`/plans/${planId}/subscribe`, "POST", data),
+    request(`/api/plans/${planId}/subscribe`, "POST", data),
 };
 
 // Courses API
