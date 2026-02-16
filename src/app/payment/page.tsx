@@ -38,15 +38,35 @@ function PaymentContent() {
           return;
         }
 
-        // Initialize subscription
-        const response: any = await SubscriptionsApi.initSubscription(planId);
-        const subscription = response.data?.subscription || response.data;
+        // Try to initialize subscription
+        try {
+          const response: any = await SubscriptionsApi.initSubscription(planId);
+          const subscription = response.data?.subscription || response.data;
 
-        if (!subscription || !subscription.id) {
-          throw new Error("Failed to initialize subscription");
+          if (!subscription || !subscription.id) {
+            throw new Error("Failed to initialize subscription");
+          }
+
+          setSubscriptionId(subscription.id);
+        } catch (err: any) {
+          // Check if error is about existing pending subscription
+          if (err.message?.toLowerCase().includes("pending subscription") ||
+            err.message?.toLowerCase().includes("already have")) {
+
+            // Fetch current subscription to get its ID
+            const currentSubResponse: any = await SubscriptionsApi.getCurrentSubscription();
+            const currentSub = currentSubResponse.data || currentSubResponse;
+
+            if (currentSub && currentSub.id && currentSub.status === "PENDING") {
+              // Use the existing pending subscription
+              setSubscriptionId(currentSub.id);
+            } else {
+              throw new Error("Unable to process your subscription. Please contact support.");
+            }
+          } else {
+            throw err;
+          }
         }
-
-        setSubscriptionId(subscription.id);
 
         // Load Cashfree SDK
         await loadCashfreeSDK();
