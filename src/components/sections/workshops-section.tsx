@@ -22,7 +22,7 @@ const workshops = [
     time: "10:00 AM",
     level: "Intermediate",
     attendees: 450,
-    price: "₹999",
+    price: "₹10",
     image: "from-blue-600 to-indigo-600",
     icon: Zap,
     popular: true,
