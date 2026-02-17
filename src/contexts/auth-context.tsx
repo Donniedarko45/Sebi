@@ -9,6 +9,10 @@ export interface User {
   name: string | null;
   email: string | null;
   hasAccess: boolean;
+  pan?: string;
+  aadhar?: string;
+  dob?: string;
+  gender?: string;
 }
 
 interface SendOTPResponse {
@@ -35,7 +39,7 @@ interface AuthContextType {
   verifyOTP: (phone: string, otp: string) => Promise<{ isNewUser: boolean }>;
   logout: () => void;
   isAuthenticated: boolean;
-  updateProfile: (data: { name: string; email: string }) => Promise<void>;
+  updateProfile: (data: Partial<User>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -65,10 +69,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     initAuth();
   }, []);
 
-  const sendOTP = async (phone: string): Promise<{ message: string; userId: string }> => {
+  const sendOTP = async (
+    phone: string,
+  ): Promise<{ message: string; userId: string }> => {
     setIsLoading(true);
     try {
-      const response = await AuthApi.sendOTP(phone) as SendOTPResponse;
+      const response = (await AuthApi.sendOTP(phone)) as SendOTPResponse;
       return response.data;
     } catch (error) {
       console.error("Send OTP failed:", error);
@@ -78,10 +84,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const verifyOTP = async (phone: string, otp: string): Promise<{ isNewUser: boolean }> => {
+  const verifyOTP = async (
+    phone: string,
+    otp: string,
+  ): Promise<{ isNewUser: boolean }> => {
     setIsLoading(true);
     try {
-      const response = await AuthApi.verifyOTP(phone, otp) as VerifyOTPResponse;
+      const response = (await AuthApi.verifyOTP(
+        phone,
+        otp,
+      )) as VerifyOTPResponse;
       const { token, user: userData, isNewUser } = response.data;
 
       if (token) {
@@ -109,7 +121,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const updateProfile = async (data: { name: string; email: string }) => {
+  const updateProfile = async (data: Partial<User>) => {
     try {
       const response: any = await AuthApi.updateProfile(data);
       const updatedUser = response.data || response;

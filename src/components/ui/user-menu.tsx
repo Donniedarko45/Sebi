@@ -3,7 +3,13 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { User, Settings, LogOut, ChevronDown } from "lucide-react";
+import {
+  User,
+  LogOut,
+  ChevronDown,
+  LayoutDashboard,
+  CreditCard,
+} from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { useRouter } from "next/navigation";
 
@@ -45,8 +51,8 @@ export function UserMenu() {
         .toUpperCase()
         .slice(0, 2)
     : user.email
-    ? user.email.substring(0, 2).toUpperCase()
-    : "??";
+      ? user.email.substring(0, 2).toUpperCase()
+      : "??";
 
   return (
     <div className="relative" ref={menuRef}>
@@ -105,16 +111,24 @@ export function UserMenu() {
                 onClick={() => setIsOpen(false)}
                 className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-primary/5 hover:text-primary dark:hover:bg-white/5 dark:hover:text-white transition-all"
               >
-                <User className="w-4 h-4" />
-                View Profile
+                <LayoutDashboard className="w-4 h-4" />
+                Dashboard
               </Link>
               <Link
                 href="/profile"
                 onClick={() => setIsOpen(false)}
                 className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-primary/5 hover:text-primary dark:hover:bg-white/5 dark:hover:text-white transition-all"
               >
-                <Settings className="w-4 h-4" />
-                Account Settings
+                <User className="w-4 h-4" />
+                Profile
+              </Link>
+              <Link
+                href="/plans"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-primary/5 hover:text-primary dark:hover:bg-white/5 dark:hover:text-white transition-all"
+              >
+                <CreditCard className="w-4 h-4" />
+                My Plans
               </Link>
             </div>
 

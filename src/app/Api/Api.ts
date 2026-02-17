@@ -31,10 +31,11 @@ async function request<T>(
   endpoint: string,
   method: RequestMethod = "GET",
   body?: any,
-  customHeaders: Record<string, string> = {}
+  customHeaders: Record<string, string> = {},
 ): Promise<T> {
-  const url = `${BASE_URL}${endpoint.startsWith("/") ? endpoint : "/" + endpoint
-    }`;
+  const url = `${BASE_URL}${
+    endpoint.startsWith("/") ? endpoint : "/" + endpoint
+  }`;
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -69,11 +70,12 @@ export const AuthApi = {
   // Send OTP to user's WhatsApp number
   sendOTP: (phone: string) => request("/api/auth/send-otp", "POST", { phone }),
   // Verify OTP and get JWT token
-  verifyOTP: (phone: string, otp: string) => request("/api/auth/verify-otp", "POST", { phone, otp }),
+  verifyOTP: (phone: string, otp: string) =>
+    request("/api/auth/verify-otp", "POST", { phone, otp }),
   // Get user profile
   getProfile: () => request("/api/users/profile", "GET"),
-  // Update user profile (name, email)
-  updateProfile: (data: { name: string; email: string }) => request("/api/users/profile", "PUT", data),
+  // Update user profile (name, email, kyc)
+  updateProfile: (data: any) => request("/api/users/profile", "PUT", data),
 };
 
 // Contact API
@@ -106,13 +108,15 @@ export const WorkshopsApi = {
 
 // Subscriptions API
 export const SubscriptionsApi = {
-  initSubscription: (planId: string) => request("/api/subscriptions/init", "POST", { planId }),
+  initSubscription: (planId: string) =>
+    request("/api/subscriptions/init", "POST", { planId }),
   getCurrentSubscription: () => request("/api/subscriptions/current", "GET"),
 };
 
 // Payment API
 export const PaymentApi = {
-  createOrder: (subscriptionId: string) => request("/api/payments/create-order", "POST", { subscriptionId }),
+  createOrder: (subscriptionId: string) =>
+    request("/api/payments/create-order", "POST", { subscriptionId }),
   verifyPayment: (data: any) => request("/api/payment/verify", "POST", data),
 };
 
