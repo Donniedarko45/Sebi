@@ -82,7 +82,7 @@ export default function WorkshopsPage() {
                   </div>
 
                   <button className="bg-white text-primary px-8 py-4 rounded-xl font-bold hover:bg-blue-50 transition-colors shadow-lg">
-                    Register for ₹999
+                    Register for ₹10
                   </button>
                 </div>
 
