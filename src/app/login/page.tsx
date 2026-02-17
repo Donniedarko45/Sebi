@@ -31,7 +31,7 @@ export default function LoginPage() {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      router.push("/");
+      router.push("/plans");
     }
   }, [isAuthenticated, router]);
 
@@ -95,13 +95,9 @@ export default function LoginPage() {
 
     setIsSubmitting(true);
     try {
-      const { isNewUser } = await verifyOTP(phone, otp);
-      // Redirect based on whether it's a new user
-      if (isNewUser) {
-        router.push("/profile");
-      } else {
-        router.push("/");
-      }
+      await verifyOTP(phone, otp);
+      // Redirect to plans page
+      router.push("/plans");
     } catch (err: any) {
       setError(err.message || "Invalid OTP. Please try again.");
     } finally {

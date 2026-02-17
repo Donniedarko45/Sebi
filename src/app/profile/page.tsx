@@ -1,19 +1,42 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { User, CreditCard, Settings, LogOut, Bell, Shield, Loader2, Mail, Save } from "lucide-react";
+import {
+  User,
+  CreditCard,
+  Settings,
+  LogOut,
+  Bell,
+  Shield,
+  Loader2,
+  Mail,
+  Save,
+  FileText,
+  Calendar,
+} from "lucide-react";
 import { FadeIn } from "@/components/ui/fade-in";
 import Link from "next/link";
 import { useAuth } from "@/contexts/auth-context";
 import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
-  const { user, logout, updateProfile, isAuthenticated, isLoading: authLoading } = useAuth();
+  const {
+    user,
+    logout,
+    updateProfile,
+    isAuthenticated,
+    isLoading: authLoading,
+  } = useAuth();
   const router = useRouter();
 
-  // Profile completion form state
+  // Profile state
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [pan, setPan] = useState("");
+  const [aadhar, setAadhar] = useState("");
+  const [dob, setDob] = useState("");
+  const [gender, setGender] = useState("");
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -30,6 +53,10 @@ export default function ProfilePage() {
     if (user) {
       setName(user.name || "");
       setEmail(user.email || "");
+      setPan(user.pan || "");
+      setAadhar(user.aadhar || "");
+      setDob(user.dob || "");
+      setGender(user.gender || "");
     }
   }, [user]);
 
@@ -38,7 +65,7 @@ export default function ProfilePage() {
     router.push("/");
   };
 
-  const handleProfileUpdate = async (e: React.FormEvent) => {
+  const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSuccessMessage("");
@@ -55,7 +82,14 @@ export default function ProfilePage() {
 
     setIsSubmitting(true);
     try {
-      await updateProfile({ name: name.trim(), email: email.trim() });
+      await updateProfile({
+        name: name.trim(),
+        email: email.trim(),
+        pan,
+        aadhar,
+        dob,
+        gender,
+      });
       setSuccessMessage("Profile updated successfully!");
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (err: any) {
@@ -89,7 +123,9 @@ export default function ProfilePage() {
                   <div className="w-16 h-16 bg-primary/10 rounded-full mx-auto mb-4 flex items-center justify-center">
                     <User className="w-8 h-8 text-primary" />
                   </div>
-                  <h1 className="text-2xl font-bold text-foreground">Complete Your Profile</h1>
+                  <h1 className="text-2xl font-bold text-foreground">
+                    Complete Your Profile
+                  </h1>
                   <p className="text-gray-600 dark:text-gray-400 mt-2">
                     Welcome! Please complete your profile to continue.
                   </p>
@@ -101,7 +137,7 @@ export default function ProfilePage() {
                   </div>
                 )}
 
-                <form onSubmit={handleProfileUpdate} className="space-y-6">
+                <form onSubmit={handleSaveProfile} className="space-y-6">
                   <div className="space-y-2">
                     <label
                       htmlFor="name"
@@ -143,7 +179,9 @@ export default function ProfilePage() {
                         disabled={isSubmitting}
                       />
                     </div>
-                    <p className="text-xs text-gray-400">Optional, for important updates</p>
+                    <p className="text-xs text-gray-400">
+                      Optional, for important updates
+                    </p>
                   </div>
 
                   <button
@@ -189,11 +227,11 @@ export default function ProfilePage() {
                   <div className="w-20 h-20 bg-primary/10 rounded-full mx-auto mb-4 flex items-center justify-center text-primary font-bold text-2xl">
                     {user?.name
                       ? user.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")
-                        .toUpperCase()
-                        .slice(0, 2)
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")
+                          .toUpperCase()
+                          .slice(0, 2)
                       : "U"}
                   </div>
                   <h2 className="font-bold text-foreground">
@@ -245,10 +283,15 @@ export default function ProfilePage() {
 
             {/* Main Content Area */}
             <div className="lg:col-span-3 space-y-6">
-              {/* Profile Edit Card */}
+              {/* My Profile Card */}
               <FadeIn delay={0.2}>
                 <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6">
-                  <h3 className="font-bold text-foreground mb-6">Edit Profile</h3>
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="p-2 bg-primary/10 text-primary rounded-lg">
+                      <User className="w-5 h-5" />
+                    </div>
+                    <h3 className="font-bold text-foreground">My Profile</h3>
+                  </div>
 
                   {error && (
                     <div className="mb-4 p-3 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm">
@@ -262,48 +305,141 @@ export default function ProfilePage() {
                     </div>
                   )}
 
-                  <form onSubmit={handleProfileUpdate} className="space-y-4">
+                  <form onSubmit={handleSaveProfile} className="space-y-4">
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                          Full Name
+                          Full Name <span className="text-red-500">*</span>
                         </label>
-                        <input
-                          type="text"
-                          value={name}
-                          onChange={(e) => setName(e.target.value)}
-                          className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                          placeholder="Your name"
-                          disabled={isSubmitting}
-                        />
+                        <div className="relative">
+                          <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                          <input
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                            placeholder="Your name"
+                            required
+                            disabled={isSubmitting}
+                          />
+                        </div>
                       </div>
+
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                           Email Address
                         </label>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                          <input
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                            placeholder="you@example.com"
+                            disabled={isSubmitting}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          Phone Number
+                        </label>
                         <input
-                          type="email"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                          placeholder="you@example.com"
+                          type="text"
+                          value={user?.phone ? `+91 ${user.phone}` : ""}
+                          readOnly
+                          className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-gray-800 text-gray-500 cursor-not-allowed"
+                        />
+                      </div>
+
+                      {/* PAN Card */}
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          PAN Number
+                        </label>
+                        <input
+                          type="text"
+                          value={pan}
+                          onChange={(e) => setPan(e.target.value.toUpperCase())}
+                          className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all uppercase placeholder:normal-case"
+                          placeholder="ABCDE1234F"
+                          maxLength={10}
                           disabled={isSubmitting}
                         />
                       </div>
+
+                      {/* Aadhar Number */}
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          Aadhar Number (Optional)
+                        </label>
+                        <input
+                          type="text"
+                          value={aadhar}
+                          onChange={(e) =>
+                            setAadhar(
+                              e.target.value.replace(/\D/g, "").slice(0, 12),
+                            )
+                          }
+                          className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                          placeholder="1234 5678 9012"
+                          maxLength={12}
+                          disabled={isSubmitting}
+                        />
+                      </div>
+
+                      {/* Date of Birth */}
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          Date of Birth
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="date"
+                            value={dob}
+                            onChange={(e) => setDob(e.target.value)}
+                            className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                            disabled={isSubmitting}
+                          />
+                          <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                        </div>
+                      </div>
+
+                      {/* Gender */}
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          Gender
+                        </label>
+                        <select
+                          value={gender}
+                          onChange={(e) => setGender(e.target.value)}
+                          className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
+                          disabled={isSubmitting}
+                        >
+                          <option value="">Select Gender</option>
+                          <option value="male">Male</option>
+                          <option value="female">Female</option>
+                          <option value="other">Other</option>
+                        </select>
+                      </div>
                     </div>
-                    <div className="flex justify-end">
+
+                    <div className="flex justify-end pt-2">
                       <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="px-6 py-2 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl transition-all active:scale-[0.98] flex items-center gap-2 disabled:opacity-50"
+                        className="px-6 py-2 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl transition-all active:scale-[0.98] flex items-center gap-2 hover:bg-primary/80 disabled:opacity-50"
                       >
                         {isSubmitting ? (
                           <>
-                            <Loader2 className="w-4 h-4 animate-spin" /> Saving...
+                            <Loader2 className="w-4 h-4 animate-spin" />{" "}
+                            Saving...
                           </>
                         ) : (
                           <>
-                            <Save className="w-4 h-4" /> Save Changes
+                            <Save className="w-4 h-4" /> Save Profile
                           </>
                         )}
                       </button>
@@ -311,8 +447,7 @@ export default function ProfilePage() {
                   </form>
                 </div>
               </FadeIn>
-
-              {/* Active Subscription Card */}
+              {/* Active Subscription Card */}\n{" "}
               <FadeIn delay={0.3}>
                 <div className="bg-gradient-to-r from-primary to-blue-600 rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
                   <div className="relative z-10 flex justify-between items-start">
@@ -324,10 +459,14 @@ export default function ProfilePage() {
                         {user?.hasAccess ? "Pro Stock Futures" : "Free Plan"}
                       </h3>
                       <p className="text-blue-100 text-sm opacity-80">
-                        {user?.hasAccess ? "Valid until: Dec 31, 2024" : "Upgrade for premium features"}
+                        {user?.hasAccess
+                          ? "Valid until: Dec 31, 2024"
+                          : "Upgrade for premium features"}
                       </p>
                     </div>
-                    <span className={`backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold border ${user?.hasAccess ? 'bg-white/20 border-white/30' : 'bg-yellow-400/20 border-yellow-400/30 text-yellow-100'}`}>
+                    <span
+                      className={`backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold border ${user?.hasAccess ? "bg-white/20 border-white/30" : "bg-yellow-400/20 border-yellow-400/30 text-yellow-100"}`}
+                    >
                       {user?.hasAccess ? "Active" : "Free"}
                     </span>
                   </div>
@@ -347,7 +486,6 @@ export default function ProfilePage() {
                   <div className="absolute right-0 top-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
                 </div>
               </FadeIn>
-
               {/* Stats Grid */}
               <div className="grid md:grid-cols-2 gap-6">
                 <FadeIn delay={0.4}>
