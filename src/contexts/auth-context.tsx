@@ -13,6 +13,8 @@ export interface User {
   aadhar?: string;
   dob?: string;
   gender?: string;
+  kycStatus?: string;
+  digioKycId?: string;
 }
 
 interface SendOTPResponse {

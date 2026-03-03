@@ -33,9 +33,8 @@ async function request<T>(
   body?: any,
   customHeaders: Record<string, string> = {},
 ): Promise<T> {
-  const url = `${BASE_URL}${
-    endpoint.startsWith("/") ? endpoint : "/" + endpoint
-  }`;
+  const url = `${BASE_URL}${endpoint.startsWith("/") ? endpoint : "/" + endpoint
+    }`;
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -134,6 +133,14 @@ export const SmallCaseApi = {
   getAll: () => request("/small-case", "GET"),
 };
 
+// eKYC API
+export const EkycApi = {
+  initKyc: (identifier: string) =>
+    request("/api/ekyc/init", "POST", { identifier }),
+  getStatus: () => request("/api/ekyc/status", "GET"),
+  updateStatus: (kycId: string, status: string) =>
+    request("/api/ekyc/update-status", "POST", { kycId, status }),
+};
 export default {
   Auth: AuthApi,
   Contact: ContactApi,
@@ -145,4 +152,5 @@ export default {
   Service: ServiceApi,
   Blog: BlogApi,
   SmallCase: SmallCaseApi,
+  Ekyc: EkycApi,
 };

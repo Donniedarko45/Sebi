@@ -227,11 +227,11 @@ export default function ProfilePage() {
                   <div className="w-20 h-20 bg-primary/10 rounded-full mx-auto mb-4 flex items-center justify-center text-primary font-bold text-2xl">
                     {user?.name
                       ? user.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")
-                          .toUpperCase()
-                          .slice(0, 2)
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")
+                        .toUpperCase()
+                        .slice(0, 2)
                       : "U"}
                   </div>
                   <h2 className="font-bold text-foreground">
@@ -256,6 +256,12 @@ export default function ProfilePage() {
                     className="flex items-center gap-3 w-full px-4 py-3 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors"
                   >
                     <CreditCard className="w-4 h-4" /> Subscription & Billing
+                  </Link>
+                  <Link
+                    href="/my-subscription"
+                    className="flex items-center gap-3 w-full px-4 py-3 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                  >
+                    <Shield className="w-4 h-4" /> My Subscription & KYC
                   </Link>
                   <Link
                     href="/profile/notifications"

@@ -103,7 +103,7 @@ function PaymentContent() {
       // Create checkout instance
       const checkout = cashfree.checkout({
         paymentSessionId: orderData.paymentSessionId,
-        returnUrl: `${window.location.origin}/payment/success?subscriptionId=${subscriptionId}`,
+        returnUrl: `${window.location.origin}/my-subscription?subscriptionId=${subscriptionId}`,
       });
 
       // Redirect to Cashfree payment page
