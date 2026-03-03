@@ -72,9 +72,9 @@ export const AuthApi = {
   verifyOTP: (phone: string, otp: string) =>
     request("/api/auth/verify-otp", "POST", { phone, otp }),
   // Get user profile
-  getProfile: () => request("/api/users/profile", "GET"),
+  getProfile: () => request("/api/user/me", "GET"),
   // Update user profile (name, email, kyc)
-  updateProfile: (data: any) => request("/api/users/profile", "PUT", data),
+  updateProfile: (data: any) => request("/api/user/profile", "POST", data),
 };
 
 // Contact API
