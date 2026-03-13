@@ -121,41 +121,24 @@ export default function MySubscriptionPage() {
         setKycState("loading");
 
         try {
-            // Step 1: Call backend to init KYC with Digio
+            // Call backend to verify identity via Digio
             const response: any = await EkycApi.initKyc(
                 panInput.toUpperCase(),
                 nameInput.trim(),
                 formattedDob,
             );
-            const { kycId, customerIdentifier } = response.data || response;
+            const result = response.data || response;
 
-            if (!kycId) {
-                throw new Error("Failed to initiate eKYC. Please try again.");
-            }
-
-            // Step 2: Load Digio SDK
-            setKycState("processing");
-            await loadDigioSDK("production");
-
-            // Step 3: Start Digio eKYC popup
-            const digioResponse = await startDigioKyc(
-                kycId,
-                customerIdentifier || panInput.toUpperCase(),
-                "production",
-            );
-
-            // Step 4: Update status on backend
-            const status =
-                digioResponse.message === "success" ? "success" : "failed";
-            await EkycApi.updateStatus(kycId, status);
-
-            if (status === "success") {
+            if (result.status === "valid") {
                 setKycState("success");
                 // Refresh user profile to get updated kycStatus
                 await updateProfile({});
             } else {
                 setKycState("failed");
-                setKycError("eKYC verification was not completed. Please try again.");
+                setKycError(
+                    result.details?.remarks ||
+                    `Verification failed: ${result.status}. Please check your details and try again.`
+                );
             }
         } catch (err: any) {
             console.error("eKYC failed:", err);
