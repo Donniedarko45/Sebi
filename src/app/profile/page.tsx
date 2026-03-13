@@ -362,18 +362,36 @@ export default function ProfilePage() {
 
                       {/* PAN Card */}
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
                           PAN Number
+                          {user?.kycStatus === "VERIFIED" && (
+                            <span className="inline-flex items-center gap-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-0.5 rounded-full text-xs font-bold border border-green-200 dark:border-green-800">
+                              <Shield className="w-3 h-3" /> Verified
+                            </span>
+                          )}
                         </label>
-                        <input
-                          type="text"
-                          value={pan}
-                          onChange={(e) => setPan(e.target.value.toUpperCase())}
-                          className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all uppercase placeholder:normal-case"
-                          placeholder="ABCDE1234F"
-                          maxLength={10}
-                          disabled={isSubmitting}
-                        />
+                        <div className="relative">
+                          <FileText className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                          <input
+                            type="text"
+                            value={pan}
+                            onChange={(e) => setPan(e.target.value.toUpperCase())}
+                            className={`w-full pl-10 pr-4 py-3 rounded-xl border transition-all uppercase placeholder:normal-case ${
+                              user?.kycStatus === "VERIFIED"
+                                ? "border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950/20 text-gray-600 dark:text-gray-300 cursor-not-allowed"
+                                : "border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                            }`}
+                            placeholder="ABCDE1234F"
+                            maxLength={10}
+                            disabled={isSubmitting || user?.kycStatus === "VERIFIED"}
+                            readOnly={user?.kycStatus === "VERIFIED"}
+                          />
+                        </div>
+                        {user?.kycStatus === "VERIFIED" && (
+                          <p className="text-xs text-green-600 dark:text-green-400">
+                            PAN verified via eKYC. Cannot be modified.
+                          </p>
+                        )}
                       </div>
 
                       {/* Aadhar Number */}
@@ -451,6 +469,50 @@ export default function ProfilePage() {
                       </button>
                     </div>
                   </form>
+                </div>
+              </FadeIn>
+
+              {/* eKYC Verification Status Card */}
+              <FadeIn delay={0.25}>
+                <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+                  <div className="p-6 border-b border-gray-100 dark:border-gray-800">
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2 rounded-lg ${user?.kycStatus === "VERIFIED" ? "bg-green-100 dark:bg-green-900/30 text-green-600" : "bg-amber-100 dark:bg-amber-900/30 text-amber-600"}`}>
+                        <Shield className="w-5 h-5" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-bold text-foreground">eKYC Verification</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {user?.kycStatus === "VERIFIED"
+                            ? "Your identity has been verified"
+                            : "Required for advisory services"}
+                        </p>
+                      </div>
+                      {user?.kycStatus === "VERIFIED" ? (
+                        <span className="inline-flex items-center gap-1.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-3 py-1.5 rounded-full text-xs font-bold border border-green-200 dark:border-green-800">
+                          <Shield className="w-3.5 h-3.5" /> Verified
+                        </span>
+                      ) : (
+                        <Link
+                          href="/my-subscription"
+                          className="inline-flex items-center gap-1.5 bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-primary/90 transition-all"
+                        >
+                          <Shield className="w-3.5 h-3.5" /> Verify Now
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                  {user?.kycStatus === "VERIFIED" && user?.pan && (
+                    <div className="p-6 bg-green-50/50 dark:bg-green-950/10">
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 text-sm">
+                          <span className="text-gray-500 dark:text-gray-400">PAN:</span>
+                          <span className="font-mono font-bold text-foreground">{user.pan}</span>
+                        </div>
+                        <span className="text-xs text-green-600 dark:text-green-400 font-medium">✓ Verified via Digio</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </FadeIn>
               {/* Active Subscription Card */}\n{" "}
