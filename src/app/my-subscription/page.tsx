@@ -13,6 +13,7 @@ import {
     Clock,
     ArrowRight,
     FileText,
+    User,
 } from "lucide-react";
 import { FadeIn } from "@/components/ui/fade-in";
 import { useAuth } from "@/contexts/auth-context";
@@ -49,6 +50,8 @@ export default function MySubscriptionPage() {
     const [kycState, setKycState] = useState<KycFlowState>("idle");
     const [kycError, setKycError] = useState("");
     const [panInput, setPanInput] = useState("");
+    const [nameInput, setNameInput] = useState("");
+    const [dobInput, setDobInput] = useState("");
 
     // Redirect if not authenticated
     useEffect(() => {
@@ -96,12 +99,34 @@ export default function MySubscriptionPage() {
             return;
         }
 
+        if (!nameInput.trim()) {
+            setKycError("Please enter your full name as per PAN card.");
+            return;
+        }
+
+        if (!dobInput.trim()) {
+            setKycError("Please enter your date of birth.");
+            return;
+        }
+
+        // Convert date from yyyy-MM-dd (HTML input) to dd/MM/yyyy (API format)
+        const dobParts = dobInput.split("-");
+        if (dobParts.length !== 3) {
+            setKycError("Invalid date of birth format.");
+            return;
+        }
+        const formattedDob = `${dobParts[2]}/${dobParts[1]}/${dobParts[0]}`;
+
         setKycError("");
         setKycState("loading");
 
         try {
             // Step 1: Call backend to init KYC with Digio
-            const response: any = await EkycApi.initKyc(panInput.toUpperCase());
+            const response: any = await EkycApi.initKyc(
+                panInput.toUpperCase(),
+                nameInput.trim(),
+                formattedDob,
+            );
             const { kycId, customerIdentifier } = response.data || response;
 
             if (!kycId) {
@@ -420,6 +445,53 @@ export default function MySubscriptionPage() {
                                                     </div>
                                                 </div>
 
+                                                {/* Full Name Input */}
+                                                <div className="space-y-3">
+                                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                        Full Name (as per PAN){" "}
+                                                        <span className="text-red-500">*</span>
+                                                    </label>
+                                                    <div className="relative">
+                                                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                                        <input
+                                                            type="text"
+                                                            value={nameInput}
+                                                            onChange={(e) =>
+                                                                setNameInput(e.target.value)
+                                                            }
+                                                            className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-foreground"
+                                                            placeholder="John Doe"
+                                                            disabled={
+                                                                kycState === "loading" ||
+                                                                kycState === "processing"
+                                                            }
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                {/* Date of Birth Input */}
+                                                <div className="space-y-3">
+                                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                        Date of Birth{" "}
+                                                        <span className="text-red-500">*</span>
+                                                    </label>
+                                                    <div className="relative">
+                                                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                                        <input
+                                                            type="date"
+                                                            value={dobInput}
+                                                            onChange={(e) =>
+                                                                setDobInput(e.target.value)
+                                                            }
+                                                            className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-foreground"
+                                                            disabled={
+                                                                kycState === "loading" ||
+                                                                kycState === "processing"
+                                                            }
+                                                        />
+                                                    </div>
+                                                </div>
+
                                                 {/* Error */}
                                                 {kycError && (
                                                     <div className="p-3 bg-red-50 dark:bg-red-950/20 rounded-xl border border-red-200 dark:border-red-800 flex items-start gap-3">
@@ -436,7 +508,9 @@ export default function MySubscriptionPage() {
                                                     disabled={
                                                         kycState === "loading" ||
                                                         kycState === "processing" ||
-                                                        !panInput.trim()
+                                                        !panInput.trim() ||
+                                                        !nameInput.trim() ||
+                                                        !dobInput.trim()
                                                     }
                                                     className="w-full py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                                 >

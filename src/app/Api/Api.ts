@@ -1,4 +1,4 @@
-export const BASE_URL = "https://project-consult-1.onrender.com";
+export const BASE_URL = "http://localhost:3000";
 
 type RequestMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
@@ -135,8 +135,8 @@ export const SmallCaseApi = {
 
 // eKYC API
 export const EkycApi = {
-  initKyc: (identifier: string) =>
-    request("/api/ekyc/init", "POST", { identifier }),
+  initKyc: (identifier: string, name?: string, dob?: string) =>
+    request("/api/ekyc/init", "POST", { identifier, name, dob }),
   getStatus: () => request("/api/ekyc/status", "GET"),
   updateStatus: (kycId: string, status: string) =>
     request("/api/ekyc/update-status", "POST", { kycId, status }),
