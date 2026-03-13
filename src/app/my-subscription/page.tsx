@@ -18,7 +18,6 @@ import {
 import { FadeIn } from "@/components/ui/fade-in";
 import { useAuth } from "@/contexts/auth-context";
 import { SubscriptionsApi, EkycApi } from "@/app/Api/Api";
-import { loadDigioSDK, startDigioKyc } from "@/utils/load-digio";
 import Link from "next/link";
 
 interface Subscription {
@@ -39,7 +38,7 @@ type PageState = "loading" | "no-subscription" | "loaded" | "error";
 type KycFlowState = "idle" | "loading" | "processing" | "success" | "failed";
 
 export default function MySubscriptionPage() {
-    const { user, isAuthenticated, isLoading: authLoading, updateProfile } = useAuth();
+    const { user, isAuthenticated, isLoading: authLoading, refreshProfile } = useAuth();
     const router = useRouter();
 
     const [pageState, setPageState] = useState<PageState>("loading");
@@ -132,7 +131,7 @@ export default function MySubscriptionPage() {
             if (result.status === "valid") {
                 setKycState("success");
                 // Refresh user profile to get updated kycStatus
-                await updateProfile({});
+                await refreshProfile();
             } else {
                 setKycState("failed");
                 setKycError(

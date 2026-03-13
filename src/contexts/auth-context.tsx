@@ -42,6 +42,7 @@ interface AuthContextType {
   logout: () => void;
   isAuthenticated: boolean;
   updateProfile: (data: Partial<User>) => Promise<void>;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -134,6 +135,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const refreshProfile = async () => {
+    try {
+      const response: any = await AuthApi.getProfile();
+      const userData = response.data || response;
+      setUser(userData);
+      localStorage.setItem("user", JSON.stringify(userData));
+    } catch (error) {
+      console.error("Failed to refresh profile:", error);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -144,6 +156,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         logout,
         isAuthenticated: !!user,
         updateProfile,
+        refreshProfile,
       }}
     >
       {children}
