@@ -1,4 +1,4 @@
-export const BASE_URL = "http://localhost:3000";
+export const BASE_URL = "http://localhost:";
 
 type RequestMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
@@ -135,8 +135,8 @@ export const SmallCaseApi = {
 
 // eKYC API
 export const EkycApi = {
-  initKyc: (identifier: string, name?: string, dob?: string) =>
-    request("/api/ekyc/init", "POST", { identifier, name, dob }),
+  initKyc: (identifier: string) =>
+    request("/api/ekyc/init", "POST", { identifier }),
   getStatus: () => request("/api/ekyc/status", "GET"),
   updateStatus: (kycId: string, status: string) =>
     request("/api/ekyc/update-status", "POST", { kycId, status }),
