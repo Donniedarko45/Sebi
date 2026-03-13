@@ -135,8 +135,8 @@ export const SmallCaseApi = {
 
 // eKYC API
 export const EkycApi = {
-  initKyc: (identifier: string) =>
-    request("/api/ekyc/init", "POST", { identifier }),
+  initKyc: (pan: string, name: string, dob: string) =>
+    request("/api/ekyc/init", "POST", { pan, name, dob }),
   getStatus: () => request("/api/ekyc/status", "GET"),
   updateStatus: (kycId: string, status: string) =>
     request("/api/ekyc/update-status", "POST", { kycId, status }),
