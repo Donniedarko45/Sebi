@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
     CheckCircle,
@@ -14,10 +14,12 @@ import {
     ArrowRight,
     FileText,
     User,
+    PenTool,
 } from "lucide-react";
 import { FadeIn } from "@/components/ui/fade-in";
 import { useAuth } from "@/contexts/auth-context";
-import { SubscriptionsApi, EkycApi } from "@/app/Api/Api";
+import { SubscriptionsApi, EkycApi, ESignApi } from "@/app/Api/Api";
+import { loadDigioSDK, startDigioSign } from "@/utils/load-digio";
 import Link from "next/link";
 
 interface Subscription {
@@ -26,6 +28,10 @@ interface Subscription {
     startDate: string | null;
     endDate: string | null;
     createdAt: string;
+    digioDocId?: string | null;
+    signStatus?: string;
+    signedAt?: string | null;
+    agreementUrl?: string | null;
     plan: {
         id: string;
         name: string;
@@ -36,6 +42,7 @@ interface Subscription {
 
 type PageState = "loading" | "no-subscription" | "loaded" | "error";
 type KycFlowState = "idle" | "loading" | "processing" | "success" | "failed";
+type SignFlowState = "idle" | "loading" | "signing" | "success" | "failed";
 
 export default function MySubscriptionPage() {
     const { user, isAuthenticated, isLoading: authLoading, refreshProfile } = useAuth();
@@ -52,6 +59,10 @@ export default function MySubscriptionPage() {
     const [nameInput, setNameInput] = useState("");
     const [dobInput, setDobInput] = useState("");
 
+    // E-Sign state
+    const [signState, setSignState] = useState<SignFlowState>("idle");
+    const [signError, setSignError] = useState("");
+
     // Redirect if not authenticated
     useEffect(() => {
         if (!authLoading && !isAuthenticated) {
@@ -60,30 +71,29 @@ export default function MySubscriptionPage() {
     }, [isAuthenticated, authLoading, router]);
 
     // Fetch subscription on mount
+    const fetchSubscription = useCallback(async () => {
+        try {
+            const response: any =
+                await SubscriptionsApi.getCurrentSubscription();
+            const sub = response.data || response;
+
+            if (sub && sub.id) {
+                setSubscription(sub);
+                setPageState("loaded");
+            } else {
+                setPageState("no-subscription");
+            }
+        } catch (err: any) {
+            console.error("Failed to fetch subscription:", err);
+            setError(err.message || "Failed to load subscription data.");
+            setPageState("error");
+        }
+    }, []);
+
     useEffect(() => {
         if (!isAuthenticated) return;
-
-        const fetchSubscription = async () => {
-            try {
-                const response: any =
-                    await SubscriptionsApi.getCurrentSubscription();
-                const sub = response.data || response;
-
-                if (sub && sub.id) {
-                    setSubscription(sub);
-                    setPageState("loaded");
-                } else {
-                    setPageState("no-subscription");
-                }
-            } catch (err: any) {
-                console.error("Failed to fetch subscription:", err);
-                setError(err.message || "Failed to load subscription data.");
-                setPageState("error");
-            }
-        };
-
         fetchSubscription();
-    }, [isAuthenticated]);
+    }, [isAuthenticated, fetchSubscription]);
 
     // Handle eKYC initiation
     const handleKycInit = async () => {
@@ -148,6 +158,70 @@ export default function MySubscriptionPage() {
         }
     };
 
+    // Handle DigiSign initiation
+    const handleSignInit = async () => {
+        if (!subscription) return;
+
+        setSignError("");
+        setSignState("loading");
+
+        try {
+            // 1. Call backend to create sign request
+            const response: any = await ESignApi.initSign(subscription.id);
+            const result = response.data || response;
+
+            const digioDocId = result.digioDocId;
+            if (!digioDocId) {
+                throw new Error("No document ID received from server.");
+            }
+
+            // Get signer identifier (email or phone)
+            const signerIdentifier = user?.email || user?.phone;
+            if (!signerIdentifier) {
+                throw new Error("No email or phone number found for signing.");
+            }
+
+            // 2. Load Digio SDK
+            setSignState("signing");
+            await loadDigioSDK("production");
+
+            // 3. Open the Digio SDK for signing
+            const signResponse = await startDigioSign(
+                digioDocId,
+                signerIdentifier,
+                "production",
+            );
+
+            console.log("[ESIGN] Digio sign response:", signResponse);
+
+            // 4. Update backend with the result
+            if (signResponse.message === "signing_completed" || signResponse.status === "signed") {
+                await ESignApi.updateSignStatus(subscription.id, "success");
+                setSignState("success");
+
+                // Refresh subscription to get updated signStatus
+                await fetchSubscription();
+            } else {
+                await ESignApi.updateSignStatus(subscription.id, "failed");
+                setSignState("failed");
+                setSignError(signResponse.message || "Signing was not completed.");
+            }
+
+        } catch (err: any) {
+            console.error("E-Sign failed:", err);
+
+            // Check if it was cancelled by user
+            if (err.message?.includes("cancelled") || err.message?.includes("closed")) {
+                setSignError("Signing was cancelled. You can try again when ready.");
+            } else {
+                setSignError(
+                    err.message || "Agreement signing failed. Please try again.",
+                );
+            }
+            setSignState("failed");
+        }
+    };
+
     const formatDate = (dateStr: string | null) => {
         if (!dateStr) return "—";
         return new Date(dateStr).toLocaleDateString("en-IN", {
@@ -191,7 +265,54 @@ export default function MySubscriptionPage() {
         }
     };
 
+    const getSignStatusBadge = (signStatus: string | undefined) => {
+        switch (signStatus) {
+            case "SIGNED":
+                return (
+                    <span className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-3 py-1 rounded-full text-xs font-bold border border-green-200 dark:border-green-800">
+                        Signed
+                    </span>
+                );
+            case "REQUESTED":
+                return (
+                    <span className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-3 py-1 rounded-full text-xs font-bold border border-blue-200 dark:border-blue-800">
+                        Pending Signature
+                    </span>
+                );
+            case "FAILED":
+                return (
+                    <span className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 px-3 py-1 rounded-full text-xs font-bold border border-red-200 dark:border-red-800">
+                        Sign Failed
+                    </span>
+                );
+            default:
+                return (
+                    <span className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-400 px-3 py-1 rounded-full text-xs font-bold border border-gray-200 dark:border-gray-700">
+                        Not Signed
+                    </span>
+                );
+        }
+    };
+
     const kycVerified = user?.kycStatus === "VERIFIED";
+    const isSigned = subscription?.signStatus === "SIGNED" || signState === "success";
+    const isSignRequested = subscription?.signStatus === "REQUESTED";
+    const paymentDone = subscription?.status === "ACTIVE" || !!subscription?.startDate;
+
+    // Determine current step for progress indicator
+    const getStepStatus = (step: "payment" | "kyc" | "sign") => {
+        switch (step) {
+            case "payment":
+                return paymentDone ? "completed" : "pending";
+            case "kyc":
+                if (!paymentDone) return "locked";
+                return kycVerified ? "completed" : "pending";
+            case "sign":
+                if (!paymentDone || !kycVerified) return "locked";
+                if (isSigned) return "completed";
+                return "pending";
+        }
+    };
 
     // Loading
     if (authLoading || pageState === "loading") {
@@ -285,7 +406,10 @@ export default function MySubscriptionPage() {
                                                     {subscription.plan.name}
                                                 </h2>
                                             </div>
-                                            {getStatusBadge(subscription.status)}
+                                            <div className="flex items-center gap-2">
+                                                {getStatusBadge(subscription.status)}
+                                                {getSignStatusBadge(subscription.signStatus)}
+                                            </div>
                                         </div>
 
                                         <div className="grid sm:grid-cols-3 gap-6 mb-6">
@@ -341,6 +465,72 @@ export default function MySubscriptionPage() {
                                 </div>
                             </FadeIn>
 
+                            {/* Progress Steps */}
+                            <FadeIn delay={0.05}>
+                                <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6">
+                                    <h3 className="font-bold text-foreground mb-4 text-sm uppercase tracking-wider">
+                                        Onboarding Progress
+                                    </h3>
+                                    <div className="flex items-center gap-0">
+                                        {/* Step 1: Payment */}
+                                        <div className="flex items-center gap-2 flex-1">
+                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                                                getStepStatus("payment") === "completed"
+                                                    ? "bg-green-500 text-white"
+                                                    : "bg-gray-200 dark:bg-gray-700 text-gray-500"
+                                            }`}>
+                                                {getStepStatus("payment") === "completed" ? (
+                                                    <CheckCircle className="w-5 h-5" />
+                                                ) : (
+                                                    <CreditCard className="w-4 h-4" />
+                                                )}
+                                            </div>
+                                            <span className="text-xs font-medium text-foreground hidden sm:block">Payment</span>
+                                        </div>
+
+                                        <div className={`h-0.5 flex-1 max-w-[60px] ${getStepStatus("payment") === "completed" ? "bg-green-500" : "bg-gray-200 dark:bg-gray-700"}`} />
+
+                                        {/* Step 2: KYC */}
+                                        <div className="flex items-center gap-2 flex-1">
+                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                                                getStepStatus("kyc") === "completed"
+                                                    ? "bg-green-500 text-white"
+                                                    : getStepStatus("kyc") === "locked"
+                                                        ? "bg-gray-100 dark:bg-gray-800 text-gray-400"
+                                                        : "bg-amber-100 dark:bg-amber-900/30 text-amber-600"
+                                            }`}>
+                                                {getStepStatus("kyc") === "completed" ? (
+                                                    <CheckCircle className="w-5 h-5" />
+                                                ) : (
+                                                    <Shield className="w-4 h-4" />
+                                                )}
+                                            </div>
+                                            <span className="text-xs font-medium text-foreground hidden sm:block">KYC</span>
+                                        </div>
+
+                                        <div className={`h-0.5 flex-1 max-w-[60px] ${getStepStatus("kyc") === "completed" ? "bg-green-500" : "bg-gray-200 dark:bg-gray-700"}`} />
+
+                                        {/* Step 3: DigiSign */}
+                                        <div className="flex items-center gap-2 flex-1">
+                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                                                getStepStatus("sign") === "completed"
+                                                    ? "bg-green-500 text-white"
+                                                    : getStepStatus("sign") === "locked"
+                                                        ? "bg-gray-100 dark:bg-gray-800 text-gray-400"
+                                                        : "bg-blue-100 dark:bg-blue-900/30 text-blue-600"
+                                            }`}>
+                                                {getStepStatus("sign") === "completed" ? (
+                                                    <CheckCircle className="w-5 h-5" />
+                                                ) : (
+                                                    <PenTool className="w-4 h-4" />
+                                                )}
+                                            </div>
+                                            <span className="text-xs font-medium text-foreground hidden sm:block">Agreement</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </FadeIn>
+
                             {/* eKYC Section */}
                             <FadeIn delay={0.1}>
                                 <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
@@ -377,8 +567,8 @@ export default function MySubscriptionPage() {
                                                         eKYC Verified Successfully
                                                     </p>
                                                     <p className="text-sm text-green-700 dark:text-green-300">
-                                                        Your identity verification is complete. You have
-                                                        full access to all advisory services.
+                                                        Your identity verification is complete.
+                                                        {!isSigned && " Please proceed to sign the agreement below."}
                                                     </p>
                                                 </div>
                                             </div>
@@ -527,6 +717,133 @@ export default function MySubscriptionPage() {
                                     </div>
                                 </div>
                             </FadeIn>
+
+                            {/* DigiSign Section - Shows after KYC is verified */}
+                            {(kycVerified || kycState === "success") && (
+                                <FadeIn delay={0.15}>
+                                    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+                                        <div className="p-6 border-b border-gray-100 dark:border-gray-800">
+                                            <div className="flex items-center gap-3">
+                                                <div
+                                                    className={`p-2 rounded-lg ${
+                                                        isSigned
+                                                            ? "bg-green-100 dark:bg-green-900/30 text-green-600"
+                                                            : "bg-blue-100 dark:bg-blue-900/30 text-blue-600"
+                                                    }`}
+                                                >
+                                                    <PenTool className="w-5 h-5" />
+                                                </div>
+                                                <div>
+                                                    <h3 className="font-bold text-foreground">
+                                                        Sign Agreement
+                                                    </h3>
+                                                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                                                        {isSigned
+                                                            ? "Your agreement has been digitally signed"
+                                                            : "Digitally sign the advisory agreement"}
+                                                    </p>
+                                                </div>
+                                                {isSigned && (
+                                                    <CheckCircle className="w-6 h-6 text-green-500 ml-auto" />
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div className="p-6">
+                                            {isSigned ? (
+                                                /* Agreement Signed */
+                                                <div className="flex items-center gap-4 p-4 bg-green-50 dark:bg-green-950/20 rounded-xl border border-green-200 dark:border-green-800">
+                                                    <CheckCircle className="w-10 h-10 text-green-500 flex-shrink-0" />
+                                                    <div>
+                                                        <p className="font-bold text-green-800 dark:text-green-200">
+                                                            Agreement Signed Successfully
+                                                        </p>
+                                                        <p className="text-sm text-green-700 dark:text-green-300">
+                                                            Your advisory agreement has been digitally signed.
+                                                            {subscription?.signedAt && (
+                                                                <span> Signed on {formatDate(subscription.signedAt)}</span>
+                                                            )}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                /* Agreement Not Signed */
+                                                <div className="space-y-4">
+                                                    {/* Info */}
+                                                    <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-xl border border-blue-200 dark:border-blue-800">
+                                                        <div className="flex items-start gap-3">
+                                                            <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                                                            <div>
+                                                                <p className="font-semibold text-blue-900 dark:text-blue-100 text-sm">
+                                                                    {isSignRequested
+                                                                        ? "Continue signing your agreement"
+                                                                        : "Sign your advisory agreement"}
+                                                                </p>
+                                                                <p className="text-sm text-blue-800 dark:text-blue-200 mt-1">
+                                                                    As per SEBI regulations, a digitally signed agreement
+                                                                    is required between the advisor and client. This uses
+                                                                    Digio&apos;s e-sign platform for a legally valid signature.
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Error */}
+                                                    {signError && (
+                                                        <div className="p-3 bg-red-50 dark:bg-red-950/20 rounded-xl border border-red-200 dark:border-red-800 flex items-start gap-3">
+                                                            <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                                                            <p className="text-sm text-red-900 dark:text-red-100">
+                                                                {signError}
+                                                            </p>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Sign Button */}
+                                                    <button
+                                                        onClick={handleSignInit}
+                                                        disabled={
+                                                            signState === "loading" ||
+                                                            signState === "signing"
+                                                        }
+                                                        className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                                    >
+                                                        {signState === "loading" ? (
+                                                            <>
+                                                                <Loader2 className="w-5 h-5 animate-spin" />
+                                                                Creating sign request...
+                                                            </>
+                                                        ) : signState === "signing" ? (
+                                                            <>
+                                                                <Loader2 className="w-5 h-5 animate-spin" />
+                                                                Opening Digio for signing...
+                                                            </>
+                                                        ) : signState === "failed" ? (
+                                                            <>
+                                                                <PenTool className="w-5 h-5" />
+                                                                Retry Signing Agreement
+                                                            </>
+                                                        ) : isSignRequested ? (
+                                                            <>
+                                                                <PenTool className="w-5 h-5" />
+                                                                Continue Signing Agreement
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <PenTool className="w-5 h-5" />
+                                                                Sign Agreement
+                                                            </>
+                                                        )}
+                                                    </button>
+
+                                                    <p className="text-xs text-gray-400 text-center">
+                                                        Powered by Digio • Legally valid e-signature
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </FadeIn>
+                            )}
 
                             {/* Quick Actions */}
                             <FadeIn delay={0.2}>

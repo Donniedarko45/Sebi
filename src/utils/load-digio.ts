@@ -100,4 +100,36 @@ export const startDigioKyc = (
     });
 };
 
+/**
+ * Initialize and start the Digio e-Sign flow
+ * Uses the same SDK as KYC but opens a document for signing
+ * 
+ * @param documentId - The Digio document ID (returned from backend initSign)
+ * @param identifier - Signer's email or phone number
+ * @param mode       - "sandbox" or "production"
+ */
+export const startDigioSign = (
+    documentId: string,
+    identifier: string,
+    mode: "sandbox" | "production" = "production",
+): Promise<DigioResponse> => {
+    return new Promise((resolve, reject) => {
+        if (!window.Digio) {
+            reject(new Error("Digio SDK not loaded. Call loadDigioSDK() first."));
+            return;
+        }
+
+        const digio = new window.Digio({
+            environment: mode,
+            callback: (response: DigioResponse) => {
+                resolve(response);
+            },
+            is_iframe: false,
+        });
+
+        digio.init();
+        digio.submit(documentId, identifier);
+    });
+};
+
 export type { DigioResponse, DigioOptions, DigioInstance };

@@ -141,6 +141,20 @@ export const EkycApi = {
   updateStatus: (kycId: string, status: string) =>
     request("/api/ekyc/update-status", "POST", { kycId, status }),
 };
+
+// E-Sign (DigiSign) API
+export const ESignApi = {
+  // Create a sign request for a subscription agreement
+  initSign: (subscriptionId: string) =>
+    request("/api/ekyc/sign/init", "POST", { subscriptionId }),
+  // Get sign status for a subscription
+  getSignStatus: (subscriptionId: string) =>
+    request(`/api/ekyc/sign/status/${subscriptionId}`, "GET"),
+  // Update sign status after frontend Digio SDK callback
+  updateSignStatus: (subscriptionId: string, status: string) =>
+    request("/api/ekyc/sign/update-status", "POST", { subscriptionId, status }),
+};
+
 export default {
   Auth: AuthApi,
   Contact: ContactApi,
@@ -153,4 +167,5 @@ export default {
   Blog: BlogApi,
   SmallCase: SmallCaseApi,
   Ekyc: EkycApi,
+  ESign: ESignApi,
 };
