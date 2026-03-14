@@ -32,14 +32,14 @@ export default function BillingPage() {
   const plans = [
     {
       name: "Basic",
-      price: "₹2,999",
+      price: "₹5",
       period: "month",
       features: ["Daily market analysis", "Email support", "Basic tools"],
       current: false,
     },
     {
       name: "Pro",
-      price: "₹4,999",
+      price: "₹6",
       period: "month",
       features: [
         "All Basic features",
@@ -51,7 +51,7 @@ export default function BillingPage() {
     },
     {
       name: "Enterprise",
-      price: "₹9,999",
+      price: "₹9",
       period: "month",
       features: [
         "All Pro features",
@@ -114,11 +114,10 @@ export default function BillingPage() {
                 {plans.map((plan, index) => (
                   <div
                     key={plan.name}
-                    className={`bg-white dark:bg-gray-900 rounded-xl border-2 p-6 ${
-                      plan.current
+                    className={`bg-white dark:bg-gray-900 rounded-xl border-2 p-6 ${plan.current
                         ? "border-primary"
                         : "border-gray-200 dark:border-gray-800"
-                    }`}
+                      }`}
                   >
                     {plan.current && (
                       <span className="bg-primary/10 text-primary text-xs font-bold px-3 py-1 rounded-full">
@@ -146,11 +145,10 @@ export default function BillingPage() {
                       ))}
                     </ul>
                     <button
-                      className={`w-full py-3 rounded-xl font-bold transition-all ${
-                        plan.current
+                      className={`w-full py-3 rounded-xl font-bold transition-all ${plan.current
                           ? "bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed"
                           : "bg-primary text-white hover:bg-primary/90"
-                      }`}
+                        }`}
                       disabled={plan.current}
                     >
                       {plan.current ? "Current Plan" : "Upgrade"}
