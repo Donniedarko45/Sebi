@@ -116,7 +116,8 @@ export const SubscriptionsApi = {
 export const PaymentApi = {
   createOrder: (subscriptionId: string) =>
     request("/api/payments/create-order", "POST", { subscriptionId }),
-  verifyPayment: (data: any) => request("/api/payment/verify", "POST", data),
+  verifyPayment: (subscriptionId: string) =>
+    request("/api/payments/verify", "POST", { subscriptionId }),
 };
 
 // General/Other APIs reflecting the file structure

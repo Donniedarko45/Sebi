@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { FadeIn } from "@/components/ui/fade-in";
 import { useAuth } from "@/contexts/auth-context";
-import { SubscriptionsApi, EkycApi, ESignApi } from "@/app/Api/Api";
+import { SubscriptionsApi, EkycApi, ESignApi, PaymentApi } from "@/app/Api/Api";
 import { loadDigioSDK, startDigioSign } from "@/utils/load-digio";
 import Link from "next/link";
 
@@ -80,6 +80,28 @@ export default function MySubscriptionPage() {
             if (sub && sub.id) {
                 setSubscription(sub);
                 setPageState("loaded");
+
+                // If subscription is still PENDING, auto-verify payment with Cashfree
+                if (sub.status === "PENDING") {
+                    try {
+                        console.log("[PAYMENT] Auto-verifying payment for subscription:", sub.id);
+                        const verifyRes: any = await PaymentApi.verifyPayment(sub.id);
+                        const verifyData = verifyRes.data || verifyRes;
+
+                        if (verifyData.status === "PAID" || verifyData.subscriptionStatus === "ACTIVE") {
+                            console.log("[PAYMENT] Payment verified! Re-fetching subscription...");
+                            // Re-fetch to get updated status
+                            const refreshRes: any = await SubscriptionsApi.getCurrentSubscription();
+                            const refreshedSub = refreshRes.data || refreshRes;
+                            if (refreshedSub && refreshedSub.id) {
+                                setSubscription(refreshedSub);
+                            }
+                        }
+                    } catch (verifyErr) {
+                        console.warn("[PAYMENT] Auto-verify failed (non-critical):", verifyErr);
+                        // Don't block the page — user can still see their subscription
+                    }
+                }
             } else {
                 setPageState("no-subscription");
             }
