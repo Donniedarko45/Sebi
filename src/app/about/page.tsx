@@ -6,7 +6,6 @@ import { AnimatedCounter } from "@/components/ui/animated-counter";
 import { FloatingIcons } from "@/components/ui/floating-icons";
 import Image from "next/image";
 import {
-  CheckCircle2,
   Award,
   TrendingUp,
   Users,
@@ -14,7 +13,6 @@ import {
   Target,
   ShieldCheck,
   Building2,
-  Github,
   Twitter,
   Linkedin,
 } from "lucide-react";
@@ -149,9 +147,9 @@ export default function AboutPage() {
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
                 </div>
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-8">
+                <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-8">
                   <p className="text-white font-medium italic border-l-4 border-cta pl-4">
-                    "Real research. Real results."
+                    &quot;Real research. Real results.&quot;
                   </p>
                 </div>
               </div>
@@ -163,149 +161,83 @@ export default function AboutPage() {
           </div>
         </div>
 
-        {/* --- [NEW] Our Journey Timeline --- */}
-        <div className="mb-24">
+        {/* Our Journey Timeline */}
+        <div className="mb-32">
           <FadeIn>
-            <h2 className="text-3xl font-bold mb-12 text-center text-foreground">
-              Our Journey
-            </h2>
+            <div className="text-center mb-16 px-4">
+              <h2 className="text-4xl md:text-5xl font-black mb-4 text-foreground tracking-tight">
+                Our <span className="text-primary italic">Journey</span>
+              </h2>
+              <div className="w-24 h-1 bg-cta mx-auto rounded-full mb-6" />
+              <p className="text-gray-500 dark:text-gray-400 max-w-2xl mx-auto text-lg leading-relaxed">
+                From a small trading desk to a trusted SEBI Registered Research Analyst firm. 
+                Our growth reflects our commitment to accuracy and transparency.
+              </p>
+            </div>
           </FadeIn>
-          <div className="relative max-w-4xl mx-auto pl-8 sm:pl-0 border-l-2 border-dashed border-gray-300 dark:border-gray-700 sm:border-none">
-            {/* Timeline Item 1 */}
-            <div className="relative sm:flex gap-8 mb-12 group">
-              <div className="hidden sm:block sm:w-1/2 text-right pr-8">
-                <h3 className="text-2xl font-bold text-primary dark:text-white">
-                  2015
-                </h3>
-                <p className="font-semibold text-gray-600 dark:text-gray-400">
-                  Inception
-                </p>
-                <p className="text-sm text-gray-500 mt-2">
-                  Started as a small group of passionate traders analyzing Nifty
-                  & Bank Nifty.
-                </p>
-              </div>
-              <FadeIn className="absolute left-[-33px] sm:left-1/2 sm:-translate-x-1/2 z-10">
-                <div className="w-4 h-4 rounded-full bg-cta ring-4 ring-white dark:ring-gray-900 group-hover:scale-150 transition-transform duration-300" />
-              </FadeIn>
-              <div className="sm:w-1/2 sm:pl-8 pb-8 sm:pb-0">
-                <div className="sm:hidden mb-2">
-                  <span className="text-2xl font-bold text-primary dark:text-white">
-                    2015
-                  </span>
-                  <span className="ml-2 font-semibold text-gray-600 dark:text-gray-400">
-                    Inception
-                  </span>
-                </div>
-                <p className="text-sm text-gray-500 sm:hidden">
-                  Started as a small group of passionate traders analyzing Nifty
-                  & Bank Nifty.
-                </p>
-              </div>
-            </div>
 
-            {/* Timeline Item 2 */}
-            <div className="relative sm:flex flex-row-reverse gap-8 mb-12 group">
-              <div className="hidden sm:block sm:w-1/2 text-left pl-8">
-                <h3 className="text-2xl font-bold text-primary dark:text-white">
-                  2018
-                </h3>
-                <p className="font-semibold text-gray-600 dark:text-gray-400">
-                  Full-Time Operations
-                </p>
-                <p className="text-sm text-gray-500 mt-2">
-                  Expanded to a dedicated office in Mumbai with a core team of 5
-                  analysts.
-                </p>
-              </div>
-              <FadeIn className="absolute left-[-33px] sm:left-1/2 sm:-translate-x-1/2 z-10">
-                <div className="w-4 h-4 rounded-full bg-blue-500 ring-4 ring-white dark:ring-gray-900 group-hover:scale-150 transition-transform duration-300" />
-              </FadeIn>
-              <div className="sm:w-1/2 sm:pr-8 text-right pb-8 sm:pb-0">
-                <div className="sm:hidden text-left mb-2">
-                  <span className="text-2xl font-bold text-primary dark:text-white">
-                    2018
-                  </span>
-                  <span className="ml-2 font-semibold text-gray-600 dark:text-gray-400">
-                    Full-Time Operations
-                  </span>
-                </div>
-                <p className="text-sm text-gray-500 sm:hidden text-left">
-                  Expanded to a dedicated office in Mumbai with a core team of 5
-                  analysts.
-                </p>
-              </div>
-            </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 relative">
+            {/* Background connecting line for desktop */}
+            <div className="hidden lg:block absolute top-[120px] left-0 right-0 h-0.5 bg-linear-to-r from-transparent via-gray-200 dark:via-gray-800 to-transparent -z-10" />
 
-            {/* Timeline Item 3 */}
-            <div className="relative sm:flex gap-8 mb-12 group">
-              <div className="hidden sm:block sm:w-1/2 text-right pr-8">
-                <h3 className="text-2xl font-bold text-primary dark:text-white">
-                  2021
-                </h3>
-                <p className="font-semibold text-gray-600 dark:text-gray-400">
-                  SEBI Registration
-                </p>
-                <p className="text-sm text-gray-500 mt-2">
-                  Achieved a major milestone by securing SEBI Research Analyst
-                  registration (INZ000000000).
-                </p>
-              </div>
-              <FadeIn className="absolute left-[-33px] sm:left-1/2 sm:-translate-x-1/2 z-10">
-                <div className="w-4 h-4 rounded-full bg-green-500 ring-4 ring-white dark:ring-gray-900 group-hover:scale-150 transition-transform duration-300" />
-              </FadeIn>
-              <div className="sm:w-1/2 sm:pl-8 pb-8 sm:pb-0">
-                <div className="sm:hidden mb-2">
-                  <span className="text-2xl font-bold text-primary dark:text-white">
-                    2021
-                  </span>
-                  <span className="ml-2 font-semibold text-gray-600 dark:text-gray-400">
-                    SEBI Registration
-                  </span>
-                </div>
-                <p className="text-sm text-gray-500 sm:hidden">
-                  Achieved a major milestone by securing SEBI Research Analyst
-                  registration (INZ000000000).
-                </p>
-              </div>
-            </div>
+            {[
+              {
+                year: "2015",
+                title: "Inception",
+                desc: "Started as a small group of passionate traders analyzing Nifty & Bank Nifty.",
+                icon: <TrendingUp className="w-6 h-6" />,
+                color: "bg-blue-500",
+              },
+              {
+                year: "2018",
+                title: "Full-Time Operations",
+                desc: "Expanded to a dedicated office in Mumbai with a core team of analysts.",
+                icon: <Building2 className="w-6 h-6" />,
+                color: "bg-indigo-500",
+              },
+              {
+                year: "2021",
+                title: "SEBI Registration",
+                desc: "Achieved a major milestone by securing SEBI RA registration (INH000010000).",
+                icon: <ShieldCheck className="w-6 h-6" />,
+                color: "bg-emerald-500",
+              },
+              {
+                year: "2024",
+                title: "10,000+ Clients",
+                desc: "Trusted by a growing community across India. Launched Algo-Ready research.",
+                icon: <Users className="w-6 h-6" />,
+                color: "bg-purple-500",
+              },
+            ].map((item, i) => (
+              <FadeIn key={i} delay={i * 0.15}>
+                <div className="group relative">
+                  {/* Card */}
+                  <div className="bg-white dark:bg-gray-900/40 backdrop-blur-sm p-8 rounded-3xl border border-gray-100 dark:border-gray-800/50 hover:border-primary/30 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5 h-full flex flex-col items-center text-center">
+                    
+                    {/* Year Badge */}
+                    <div className={`mb-6 p-4 rounded-2xl ${item.color} text-white shadow-xl shadow-${item.color.split('-')[1]}-500/30 group-hover:scale-110 transition-transform duration-500`}>
+                      {item.icon}
+                    </div>
 
-            {/* Timeline Item 4 */}
-            <div className="relative sm:flex flex-row-reverse gap-8 group">
-              <div className="hidden sm:block sm:w-1/2 text-left pl-8">
-                <h3 className="text-2xl font-bold text-primary dark:text-white">
-                  2024
-                </h3>
-                <p className="font-semibold text-gray-600 dark:text-gray-400">
-                  10,000+ Clients
-                </p>
-                <p className="text-sm text-gray-500 mt-2">
-                  Trusted by a growing community of traders across India.
-                  Launched Algo-Ready research.
-                </p>
-              </div>
-              <FadeIn className="absolute left-[-33px] sm:left-1/2 sm:-translate-x-1/2 z-10">
-                <div className="w-4 h-4 rounded-full bg-purple-500 ring-4 ring-white dark:ring-gray-900 group-hover:scale-150 transition-transform duration-300" />
-              </FadeIn>
-              <div className="sm:w-1/2 sm:pr-8 text-right">
-                <div className="sm:hidden text-left mb-2">
-                  <span className="text-2xl font-bold text-primary dark:text-white">
-                    2024
-                  </span>
-                  <span className="ml-2 font-semibold text-gray-600 dark:text-gray-400">
-                    10,000+ Clients
-                  </span>
+                    <div className="space-y-3">
+                      <span className="text-sm font-black text-primary/60 dark:text-blue-400/60 uppercase tracking-widest">{item.year}</span>
+                      <h3 className="text-xl font-bold text-foreground">{item.title}</h3>
+                      <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
+                        {item.desc}
+                      </p>
+                    </div>
+
+                    {/* Decorative dot for the line */}
+                    <div className="hidden lg:block absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-gray-200 dark:bg-gray-800 border-4 border-gray-50 dark:border-gray-950 group-hover:bg-primary group-hover:scale-125 transition-all duration-300" />
+                  </div>
                 </div>
-                <p className="text-sm text-gray-500 sm:hidden text-left">
-                  Trusted by a growing community of traders across India.
-                  Launched Algo-Ready research.
-                </p>
-              </div>
-            </div>
+              </FadeIn>
+            ))}
           </div>
         </div>
 
-        {/* --- [NEW] Associated With & Partners --- */}
+        {/* Associated With & Partners */}
         <div className="mb-24 py-12 bg-gray-50 dark:bg-gray-900/50 rounded-3xl border border-gray-100 dark:border-gray-800">
           <div className="container mx-auto px-4">
             <FadeIn>
@@ -347,7 +279,7 @@ export default function AboutPage() {
           </div>
         </div>
 
-        {/* --- [NEW] In The News --- */}
+        {/* In The News */}
         <div className="mb-24">
           <FadeIn>
             <h2 className="text-3xl font-bold mb-12 text-center text-foreground flex items-center justify-center gap-3">
@@ -391,7 +323,7 @@ export default function AboutPage() {
           </div>
         </div>
 
-        {/* --- [NEW] Core Team --- */}
+        {/* Core Team */}
         <div>
           <FadeIn>
             <h2 className="text-3xl font-bold mb-12 text-center text-foreground flex items-center justify-center gap-3">

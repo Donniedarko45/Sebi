@@ -8,6 +8,7 @@ import {
   Mail,
   Phone,
   MapPin,
+  Send,
 } from "lucide-react";
 
 export function Footer() {
@@ -155,6 +156,15 @@ export function Footer() {
               </li>
             </ul>
             <div className="flex gap-4 mt-6">
+              <a
+                href="https://t.me/tradewithashwinisd6"
+                target="_blank"
+                className="hover:text-cta transition-colors flex items-center gap-1"
+                suppressHydrationWarning
+              >
+                <Send className="w-5 h-5" />
+                <span className="text-xs font-bold">Join Channel</span>
+              </a>
               <a
                 href="#"
                 className="hover:text-cta transition-colors"

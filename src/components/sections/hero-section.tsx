@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { FadeIn } from "@/components/ui/fade-in";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Send } from "lucide-react";
 import { motion } from "framer-motion";
 import { TradingGraph } from "@/components/features/trading-graph";
 import { useState } from "react";
@@ -72,11 +72,12 @@ export function HeroSection() {
                   View Services <ArrowRight className="w-5 h-5" />
                 </Link>
                 <Link
-                  href="/contact"
-                  className="w-full sm:w-auto px-8 py-4 rounded-xl border-2 border-primary dark:border-gray-600 text-primary dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all font-bold text-lg"
+                  href="https://t.me/tradewithashwinisd6"
+                  target="_blank"
+                  className="w-full sm:w-auto px-8 py-4 rounded-xl border-2 border-primary dark:border-blue-400 text-primary dark:text-blue-400 hover:bg-primary/5 dark:hover:bg-blue-900/10 transition-all font-bold text-lg flex items-center justify-center gap-2"
                   suppressHydrationWarning
                 >
-                  Contact Us
+                  <Send className="w-5 h-5" /> Join Free Telegram
                 </Link>
               </div>
             </FadeIn>

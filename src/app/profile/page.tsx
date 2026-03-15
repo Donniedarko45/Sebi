@@ -515,7 +515,7 @@ export default function ProfilePage() {
                   )}
                 </div>
               </FadeIn>
-              {/* Active Subscription Card */}\n{" "}
+              {/* Active Subscription Card */}
               <FadeIn delay={0.3}>
                 <div className="bg-gradient-to-r from-primary to-blue-600 rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
                   <div className="relative z-10 flex justify-between items-start">

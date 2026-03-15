@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Send } from "lucide-react";
+import { Send, Award } from "lucide-react";
 import { FadeIn } from "@/components/ui/fade-in";
 
 export function TelegramPromo() {
@@ -38,17 +38,24 @@ export function TelegramPromo() {
               </ul>
             </div>
 
-            <div className="flex-shrink-0">
+            <div className="shrink-0 flex flex-col items-center gap-4">
               <Link
-                href="https://t.me/your_channel"
+                href="https://t.me/tradewithashwinisd6"
                 target="_blank"
-                className="inline-flex items-center px-8 py-4 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl text-lg transition-transform hover:scale-105 shadow-lg shadow-blue-500/20"
+                className="w-full inline-flex items-center justify-center px-8 py-4 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl text-lg transition-all hover:scale-105 shadow-lg shadow-blue-500/20"
               >
                 <Send className="w-5 h-5 mr-3 -ml-1" />
-                Join Channel Now
+                Free Channel
               </Link>
-              <div className="text-center mt-3 text-xs text-gray-400">
-                Free to join • No spam guaranteed
+              <Link
+                href="/plans"
+                className="w-full inline-flex items-center justify-center px-8 py-4 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl text-lg transition-all hover:scale-105 shadow-lg shadow-primary/20"
+              >
+                <Award className="w-5 h-5 mr-3 -ml-1" />
+                Paid Channel
+              </Link>
+              <div className="text-center text-xs text-gray-400">
+                Join 10,000+ traders today
               </div>
             </div>
           </div>
