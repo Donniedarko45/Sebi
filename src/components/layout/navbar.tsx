@@ -235,6 +235,13 @@ export function Navbar() {
                 </button>
               </div>
 
+              {isAuthenticated && (
+                <div className="mb-4">
+                  <UserMenu variant="inline" />
+                  <div className="h-px bg-gray-100 dark:bg-gray-800 mt-4" />
+                </div>
+              )}
+
               <nav className="flex flex-col gap-2">
                 {navLinks.map((link) => (
                   <Link
@@ -254,11 +261,16 @@ export function Navbar() {
 
               <div className="h-px bg-gray-200 dark:bg-gray-800 my-2" />
 
-              {isAuthenticated ? (
-                <div className="flex flex-col gap-2">
-                  <UserMenu />
-                </div>
-              ) : (
+              <a
+                href="https://t.me/tradewithashwinisd6"
+                target="_blank"
+                className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold bg-blue-500 text-white shadow-lg shadow-blue-500/20 hover:bg-blue-600 transition-colors"
+              >
+                <Send className="w-5 h-5" />
+                Join Free Telegram
+              </a>
+
+              {!isAuthenticated && (
                 <div className="flex flex-col gap-3">
                   <Link
                     href="/login"
