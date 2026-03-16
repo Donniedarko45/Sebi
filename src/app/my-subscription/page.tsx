@@ -217,14 +217,22 @@ export default function MySubscriptionPage() {
             console.log("[ESIGN] Digio sign response:", signResponse);
 
             // 4. Update backend with the result
-            if (signResponse.message === "signing_completed" || signResponse.status === "signed") {
-                await ESignApi.updateSignStatus(subscription.id, "success");
-                setSignState("success");
+            const isSuccess = 
+                signResponse.message === "signing_completed" || 
+                signResponse.status === "signed" || 
+                signResponse.message?.toLowerCase().includes("success");
+                
+            const statusToReport = isSuccess ? "success" : "failed";
 
+            const updateRes: any = await ESignApi.updateSignStatus(subscription.id, statusToReport);
+            const updateData = updateRes.data || updateRes;
+
+            if (updateData?.signStatus === "SIGNED" || isSuccess) {
+                setSignState("success");
+                
                 // Refresh subscription to get updated signStatus
                 await fetchSubscription();
             } else {
-                await ESignApi.updateSignStatus(subscription.id, "failed");
                 setSignState("failed");
                 setSignError(signResponse.message || "Signing was not completed.");
             }
