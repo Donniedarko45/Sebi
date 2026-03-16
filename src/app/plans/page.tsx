@@ -5,6 +5,7 @@ import { DisclaimerStrip } from "@/components/sections/disclaimer-strip";
 import { FadeIn } from "@/components/ui/fade-in";
 import { FloatingIcons } from "@/components/ui/floating-icons";
 import { PageHeader } from "@/components/layout/page-header";
+import { TelegramPromo } from "@/components/sections/telegram-promo";
 
 import { useState, useEffect } from "react";
 import { PlansApi } from "@/app/Api/Api";
@@ -153,6 +154,8 @@ export default function PlansPage() {
           </p>
         </FadeIn>
       </div>
+
+      <TelegramPromo />
 
       <DisclaimerStrip />
     </main>

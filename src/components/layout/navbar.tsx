@@ -6,7 +6,7 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Send } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { UserMenu } from "@/components/ui/user-menu";
 
@@ -29,7 +29,7 @@ export function Navbar() {
 
   return (
     <header className="sticky top-4 z-50 w-full px-4 mx-auto max-w-[95%]">
-      <div className="backdrop-blur-xl bg-white/70 dark:bg-gray-950/70 border border-white/20 dark:border-gray-800/50 rounded-2xl shadow-lg shadow-black/5 supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-gray-950/60 transition-all duration-300">
+      <div className="backdrop-blur-xl bg-white/70 dark:bg-gray-950/70 border border-white/20 dark:border-gray-800/50 rounded-2xl shadow-lg shadow-black/5 supports-backdrop-filter:bg-white/60 dark:supports-backdrop-filter:bg-gray-950/60 transition-all duration-300">
         <div className="flex h-20 items-center justify-between px-6">
           <div className="flex items-center gap-6">
             <Link
@@ -137,12 +137,28 @@ export function Navbar() {
           </nav>
 
           <div className="flex items-center gap-4">
+            <a
+              href="https://t.me/tradewithashwinisd6"
+              target="_blank"
+              className="hidden lg:flex items-center gap-2 px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-all hover:scale-105 shadow-md shadow-blue-500/20"
+            >
+              <Send className="w-4 h-4" />
+              <span className="text-[10px] font-bold uppercase tracking-wider">Free Channel</span>
+            </a>
             <ThemeToggle />
             <div className="hidden sm:flex items-center gap-3">
               {isAuthenticated ? (
                 <UserMenu />
               ) : (
                 <>
+                  <Link
+                    href="https://t.me/tradewithashwinisd6"
+                    target="_blank"
+                    className="hidden md:flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-blue-500 hover:text-blue-600 transition-colors"
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                    Free Channel
+                  </Link>
                   <Link
                     href="/login"
                     className="text-xs font-medium text-gray-700 dark:text-gray-300 hover:text-primary transition-colors px-3 py-2"
@@ -219,6 +235,13 @@ export function Navbar() {
                 </button>
               </div>
 
+              {isAuthenticated && (
+                <div className="mb-4">
+                  <UserMenu variant="inline" />
+                  <div className="h-px bg-gray-100 dark:bg-gray-800 mt-4" />
+                </div>
+              )}
+
               <nav className="flex flex-col gap-2">
                 {navLinks.map((link) => (
                   <Link
@@ -238,11 +261,16 @@ export function Navbar() {
 
               <div className="h-px bg-gray-200 dark:bg-gray-800 my-2" />
 
-              {isAuthenticated ? (
-                <div className="flex flex-col gap-2">
-                  <UserMenu />
-                </div>
-              ) : (
+              <a
+                href="https://t.me/tradewithashwinisd6"
+                target="_blank"
+                className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold bg-blue-500 text-white shadow-lg shadow-blue-500/20 hover:bg-blue-600 transition-colors"
+              >
+                <Send className="w-5 h-5" />
+                Join Free Telegram
+              </a>
+
+              {!isAuthenticated && (
                 <div className="flex flex-col gap-3">
                   <Link
                     href="/login"
