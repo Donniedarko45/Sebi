@@ -5,169 +5,112 @@ import Image from "next/image";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
-import { Menu, X, Send } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Menu, X, Send, ChevronRight } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { UserMenu } from "@/components/ui/user-menu";
 
 export function Navbar() {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [hoveredServices, setHoveredServices] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const { isAuthenticated } = useAuth();
+
+  // Handle scroll effect
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Close mobile menu on path change
+  useEffect(() => {
+    if (isMobileMenuOpen) setIsMobileMenuOpen(false);
+  }, [pathname, isMobileMenuOpen]);
 
   const navLinks = [
     { href: "/", label: "Home" },
-    { href: "/about", label: "About Us" },
-    { href: "/services", label: "Services" },
+    { href: "/services", label: "Research" },
     { href: "/plans", label: "Plans" },
-    { href: "/methodology", label: "Methodology" },
-    { href: "/charter", label: "Investor Charter" },
-    { href: "/disclosures", label: "Disclosures" },
+    { href: "/wealth-management", label: "Wealth" },
+    { href: "/courses", label: "Learning" },
     { href: "/contact", label: "Contact" },
   ];
 
   return (
-    <header className="sticky top-4 z-50 w-full px-4 mx-auto max-w-[95%]">
-      <div className="backdrop-blur-xl bg-white/70 dark:bg-gray-950/70 border border-white/20 dark:border-gray-800/50 rounded-2xl shadow-lg shadow-black/5 supports-backdrop-filter:bg-white/60 dark:supports-backdrop-filter:bg-gray-950/60 transition-all duration-300">
-        <div className="flex h-20 items-center justify-between px-6">
-          <div className="flex items-center gap-6">
-            <Link
-              href="/"
-              className="flex items-center gap-2 font-black text-2xl tracking-tighter text-transparent bg-clip-text bg-linear-to-r from-primary to-blue-600 dark:from-blue-400 dark:to-blue-200"
-            >
+    <header 
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b ${
+        scrolled 
+          ? "bg-white/90 dark:bg-gray-950/90 backdrop-blur-xl border-gray-200 dark:border-gray-800 py-3 shadow-sm" 
+          : "bg-white/50 dark:bg-gray-950/30 backdrop-blur-md border-transparent py-5"
+      }`}
+    >
+      <nav className="container mx-auto px-4 lg:px-6">
+        <div className="flex items-center justify-between gap-4">
+          {/* Logo Section */}
+          <Link
+            href="/"
+            className="flex items-center gap-2 sm:gap-3 group shrink-0"
+          >
+            <div className="relative">
+              <div className="absolute -inset-1 bg-linear-to-r from-primary to-blue-600 rounded-lg blur opacity-10 group-hover:opacity-30 transition duration-500" />
               <Image
                 src="/images/Ashwini SD.png"
-                alt="Ashwini SD Logo"
-                width={40}
-                height={40}
-                className="w-10 h-10 object-contain"
+                alt="Logo"
+                width={36}
+                height={36}
+                className="relative w-8 h-8 sm:w-9 sm:h-9 object-contain grayscale-[0.5] group-hover:grayscale-0 transition-all duration-500"
               />
-              Ashwini SD
-            </Link>
-          </div>
+            </div>
+            <span className="text-lg sm:text-xl font-extrabold tracking-tighter text-gray-900 dark:text-white hidden xs:block">
+              Ashwini<span className="text-primary -translate-x-px inline-block">SD</span>
+            </span>
+          </Link>
 
-          <nav className="hidden xl:flex items-center gap-1">
+          {/* Desktop Navigation */}
+          <div className="hidden xl:flex items-center gap-1">
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
               return (
-                <div key={link.href} className="relative group">
-                  {link.href === "/services" ? (
-                    <div
-                      onMouseEnter={() => setHoveredServices(true)}
-                      onMouseLeave={() => setHoveredServices(false)}
-                      className="relative"
-                    >
-                      <Link
-                        href={link.href}
-                        className={`px-3 py-2 text-xs font-medium transition-colors hover:text-primary dark:hover:text-white flex items-center gap-1 ${
-                          isActive || hoveredServices
-                            ? "text-primary dark:text-white"
-                            : "text-gray-600 dark:text-gray-400"
-                        }`}
-                      >
-                        {link.label}
-                        {/* <ChevronDown className="w-3 h-3 mt-0.5" /> */}
-                      </Link>
-
-                      {/* Mega Menu Dropdown */}
-                      <AnimatePresence>
-                        {hoveredServices && (
-                          <motion.div
-                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                            transition={{ duration: 0.2, ease: "easeOut" }}
-                            className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-2xl p-4 grid grid-cols-1 gap-1 z-50 overflow-hidden"
-                          >
-                            {[
-                              { label: "Research Services", href: "/services" },
-                              { label: "Courses", href: "/courses" },
-                              {
-                                label: "Wealth Management",
-                                href: "/wealth-management",
-                              },
-                              { label: "Small Case", href: "/small-case" },
-                              { label: "Workshops", href: "/workshops" },
-                              { label: "Mutual Funds", href: "/mutual-funds" },
-                              { label: "Placements", href: "/placements" },
-                              { label: "Tools", href: "/tools" },
-                              { label: "Blog", href: "/blog" },
-                              { label: "FAQs", href: "/faqs" },
-                            ].map((item) => (
-                              <Link
-                                key={item.href}
-                                href={item.href}
-                                className="block px-4 py-2.5 rounded-lg text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-primary/5 hover:text-primary dark:hover:bg-white/5 dark:hover:text-white transition-all text-left"
-                              >
-                                {item.label}
-                              </Link>
-                            ))}
-                            <div className="absolute inset-0 bg-linear-to-b from-primary/5 to-transparent pointer-events-none opacity-50" />
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  ) : (
-                    <Link
-                      href={link.href}
-                      className={`relative px-3 py-2 text-xs font-medium transition-colors hover:text-primary dark:hover:text-white ${
-                        isActive
-                          ? "text-primary dark:text-white"
-                          : "text-gray-600 dark:text-gray-400"
-                      }`}
-                    >
-                      {link.label}
-                      {isActive && (
-                        <motion.div
-                          layoutId="navbar-indicator"
-                          className="absolute inset-0 bg-primary/10 dark:bg-white/10 rounded-lg -z-10"
-                          transition={{
-                            type: "spring",
-                            bounce: 0.2,
-                            duration: 0.6,
-                          }}
-                        />
-                      )}
-                    </Link>
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`relative px-3 xxl:px-4 py-2 text-sm font-bold transition-all duration-300 rounded-xl hover:bg-primary/5 group ${
+                    isActive 
+                      ? "text-primary dark:text-white" 
+                      : "text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-white"
+                  }`}
+                >
+                  <span className="relative z-10">{link.label}</span>
+                  {isActive && (
+                    <motion.div
+                      layoutId="nav-active"
+                      className="absolute inset-0 bg-primary/10 dark:bg-primary/20 rounded-xl z-0 border border-primary/20 dark:border-primary/40"
+                    />
                   )}
-                </div>
+                </Link>
               );
             })}
-          </nav>
+          </div>
 
-          <div className="flex items-center gap-4">
-            <a
-              href="https://t.me/tradewithashwinisd6"
-              target="_blank"
-              className="hidden lg:flex items-center gap-2 px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-all hover:scale-105 shadow-md shadow-blue-500/20"
-            >
-              <Send className="w-4 h-4" />
-              <span className="text-[10px] font-bold uppercase tracking-wider">Free Channel</span>
-            </a>
+          {/* Action Tools */}
+          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
             <ThemeToggle />
-            <div className="hidden sm:flex items-center gap-3">
+            
+            <div className="hidden lg:flex items-center gap-2">
               {isAuthenticated ? (
                 <UserMenu />
               ) : (
                 <>
                   <Link
-                    href="https://t.me/tradewithashwinisd6"
-                    target="_blank"
-                    className="hidden md:flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-blue-500 hover:text-blue-600 transition-colors"
-                  >
-                    <Send className="w-3.5 h-3.5" />
-                    Free Channel
-                  </Link>
-                  <Link
                     href="/login"
-                    className="text-xs font-medium text-gray-700 dark:text-gray-300 hover:text-primary transition-colors px-3 py-2"
+                    className="text-sm font-bold text-gray-700 dark:text-gray-300 hover:text-primary transition-colors px-3 py-2"
                   >
                     Log In
                   </Link>
                   <Link
                     href="/signup"
-                    className="relative text-xs font-medium bg-primary text-white px-5 py-2.5 rounded-xl overflow-hidden group hover:shadow-lg hover:shadow-primary/25 transition-all duration-300"
+                    className="h-10 flex items-center px-5 rounded-xl bg-primary text-white text-sm font-bold shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 overflow-hidden relative group"
                   >
                     <span className="relative z-10">Get Started</span>
                     <div className="absolute inset-0 bg-linear-to-r from-blue-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -176,123 +119,114 @@ export function Navbar() {
               )}
             </div>
 
-            {/* Mobile Menu Toggle */}
+            {/* Mobile Toggle */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="xl:hidden p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+              className="xl:hidden p-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-primary/10 hover:text-primary transition-all active:scale-95"
             >
-              {isMobileMenuOpen ? (
-                <X className="w-6 h-6" />
-              ) : (
-                <Menu className="w-6 h-6" />
-              )}
+              <AnimatePresence mode="wait">
+                {isMobileMenuOpen ? (
+                  <motion.div
+                    key="close"
+                    initial={{ rotate: -90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: 90, opacity: 0 }}
+                  >
+                    <X className="w-5 h-5 sm:w-6 sm:h-6" />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="menu"
+                    initial={{ rotate: 90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: -90, opacity: 0 }}
+                  >
+                    <Menu className="w-5 h-5 sm:w-6 sm:h-6" />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </button>
           </div>
         </div>
-      </div>
+      </nav>
 
-      {/* Mobile Menu Backdrop & Drawer */}
+      {/* Modern Mobile Drawer */}
       <AnimatePresence>
         {isMobileMenuOpen && (
-          <>
-            {/* Backdrop */}
+          <div className="fixed inset-0 top-[73px] z-40 lg:hidden">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMobileMenuOpen(false)}
-              className="xl:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+              className="absolute inset-0 bg-gray-950/20 backdrop-blur-sm"
             />
-
-            {/* Drawer */}
+            
             <motion.div
-              initial={{ x: "-100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "-100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="xl:hidden fixed top-0 left-0 bottom-0 w-3/4 max-w-xs bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl border-r border-gray-200 dark:border-gray-800 shadow-2xl z-50 overflow-y-auto p-6 flex flex-col gap-4"
+              initial={{ y: -20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -20, opacity: 0 }}
+              className="absolute inset-x-4 top-0 bg-white dark:bg-gray-950 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl overflow-y-auto p-6 flex flex-col"
             >
-              <div className="flex items-center justify-between mb-4">
-                <Link
-                  href="/"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-2 font-black text-xl tracking-tighter text-transparent bg-clip-text bg-linear-to-r from-primary to-blue-600 dark:from-blue-400 dark:to-blue-200"
-                >
-                  <Image
-                    src="/images/Ashwini SD.png"
-                    alt="Ashwini SD Logo"
-                    width={32}
-                    height={32}
-                    className="w-8 h-8 object-contain"
-                  />
-                  Ashwini SD
-                </Link>
-                <button
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                >
-                  <X className="w-5 h-5 text-gray-500" />
-                </button>
+              <div className="space-y-6 flex-1">
+                {/* Mobile User Section */}
+                {isAuthenticated && (
+                  <div className="mb-4">
+                    <UserMenu variant="inline" />
+                  </div>
+                )}
+
+                <div className="space-y-1">
+                  {navLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className={`flex items-center justify-between px-5 py-4 rounded-2xl text-base font-bold transition-all group ${
+                        pathname === link.href
+                          ? "bg-primary/10 text-primary border border-primary/20"
+                          : "hover:bg-gray-50 dark:hover:bg-gray-900 text-gray-600 dark:text-gray-400"
+                      }`}
+                    >
+                      {link.label}
+                      <ChevronRight className={`w-4 h-4 transition-transform group-hover:translate-x-1 ${pathname === link.href ? "opacity-100" : "opacity-0"}`} />
+                    </Link>
+                  ))}
+                </div>
+
+                <div className="h-px bg-gray-100 dark:bg-gray-800 my-4" />
+
+                <div className="space-y-4">
+                  <a
+                    href="https://t.me/tradewithashwinisd6"
+                    target="_blank"
+                    className="flex items-center justify-center gap-3 w-full h-14 rounded-2xl bg-blue-500 text-white font-black shadow-xl shadow-blue-500/20 hover:bg-blue-600 transition-all active:scale-95"
+                  >
+                    <Send className="w-5 h-5" />
+                    Join Free Telegram
+                  </a>
+                </div>
               </div>
 
-              {isAuthenticated && (
-                <div className="mb-4">
-                  <UserMenu variant="inline" />
-                  <div className="h-px bg-gray-100 dark:bg-gray-800 mt-4" />
-                </div>
-              )}
-
-              <nav className="flex flex-col gap-2">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={`px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${
-                      pathname === link.href
-                        ? "bg-primary/10 text-primary dark:bg-white/10 dark:text-white"
-                        : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400"
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-              </nav>
-
-              <div className="h-px bg-gray-200 dark:bg-gray-800 my-2" />
-
-              <a
-                href="https://t.me/tradewithashwinisd6"
-                target="_blank"
-                className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold bg-blue-500 text-white shadow-lg shadow-blue-500/20 hover:bg-blue-600 transition-colors"
-              >
-                <Send className="w-5 h-5" />
-                Join Free Telegram
-              </a>
-
               {!isAuthenticated && (
-                <div className="flex flex-col gap-3">
+                <div className="grid grid-cols-2 gap-3 pt-6 mt-4">
                   <Link
                     href="/login"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="px-4 py-3 rounded-xl text-sm font-bold text-center border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-300 transition-colors"
+                    className="flex items-center justify-center h-14 rounded-2xl text-sm font-black border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-300 transition-all"
                   >
                     Log In
                   </Link>
                   <Link
                     href="/signup"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="px-4 py-3 rounded-xl text-sm font-bold text-center bg-primary text-white shadow-lg shadow-primary/20 hover:bg-primary/90 transition-colors"
+                    className="flex items-center justify-center h-14 rounded-2xl text-sm font-black bg-primary text-white shadow-xl shadow-primary/20 hover:bg-primary/90 transition-all"
                   >
                     Get Started
                   </Link>
                 </div>
               )}
             </motion.div>
-          </>
+          </div>
         )}
       </AnimatePresence>
     </header>
   );
 }
-

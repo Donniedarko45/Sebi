@@ -1,20 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { FadeIn } from "@/components/ui/fade-in";
-import { Calculator, IndianRupee, PieChart, TrendingUp } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Calculator, IndianRupee, TrendingUp } from "lucide-react";
 
 export function SipCalculator() {
   const [investment, setInvestment] = useState(10000);
   const [rate, setRate] = useState(12);
   const [years, setYears] = useState(10);
-  const [results, setResults] = useState({
-    invested: 0,
-    returns: 0,
-    total: 0,
-  });
 
-  useEffect(() => {
+  const results = useMemo(() => {
     // SIP Calculation Formula: M = P × ({[1 + i]^n - 1} / i) × (1 + i)
     const monthlyRate = rate / 12 / 100;
     const months = years * 12;
@@ -30,11 +24,11 @@ export function SipCalculator() {
         (1 + monthlyRate);
     }
 
-    setResults({
+    return {
       invested: Math.round(investedAmount),
       returns: Math.round(totalValue - investedAmount),
       total: Math.round(totalValue),
-    });
+    };
   }, [investment, rate, years]);
 
   const formatCurrency = (val: number) => {
@@ -57,9 +51,9 @@ export function SipCalculator() {
         </p>
       </div>
 
-      <div className="flex flex-col lg:flex-row">
+      <div className="flex flex-col xl:flex-row">
         {/* Controls Section */}
-        <div className="p-8 lg:w-1/2 space-y-8">
+        <div className="p-8 xl:w-1/2 space-y-8">
           {/* Monthly Investment */}
           <div>
             <div className="flex justify-between mb-4">
@@ -137,7 +131,7 @@ export function SipCalculator() {
         </div>
 
         {/* Results Section */}
-        <div className="p-8 lg:w-1/2 bg-gray-50 dark:bg-gray-800/50 flex flex-col justify-center">
+        <div className="p-8 xl:w-1/2 bg-gray-50 dark:bg-gray-800/50 flex flex-col justify-center overflow-hidden">
           <div className="space-y-6">
             <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-900 rounded-xl shadow-sm">
               <div className="flex items-center gap-3">
@@ -171,7 +165,7 @@ export function SipCalculator() {
               <span className="block text-sm font-semibold text-gray-500 uppercase tracking-widest mb-2">
                 Total Value
               </span>
-              <span className="block text-4xl lg:text-5xl font-black text-primary animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <span className="block text-3xl md:text-4xl lg:text-3xl xl:text-4xl font-black text-primary animate-in fade-in slide-in-from-bottom-4 duration-500 wrap-break-word">
                 {formatCurrency(results.total)}
               </span>
             </div>

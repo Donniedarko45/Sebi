@@ -11,7 +11,7 @@ export function HeroSection() {
   const [animationComplete, setAnimationComplete] = useState(false);
 
   return (
-    <section className="relative py-12 lg:py-32 overflow-hidden bg-background min-h-[600px] lg:min-h-[800px] flex items-center transition-all duration-1000">
+    <section className="relative pt-32 pb-12 lg:pt-48 lg:pb-32 overflow-hidden bg-background min-h-[600px] lg:min-h-[800px] flex items-center transition-all duration-1000">
       <div className="container mx-auto px-4 relative z-10">
         <div
           className={`grid gap-12 lg:gap-20 items-center transition-all duration-1000 ease-in-out ${
