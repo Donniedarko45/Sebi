@@ -25,8 +25,8 @@ export function Navbar() {
 
   // Close mobile menu on path change
   useEffect(() => {
-    if (isMobileMenuOpen) setIsMobileMenuOpen(false);
-  }, [pathname, isMobileMenuOpen]);
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
 
   const navLinks = [
     { href: "/", label: "Home" },
@@ -38,7 +38,8 @@ export function Navbar() {
   ];
 
   return (
-    <header 
+    <>
+      <header 
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b ${
         scrolled 
           ? "bg-white/90 dark:bg-gray-950/90 backdrop-blur-xl border-gray-200 dark:border-gray-800 py-3 shadow-sm" 
@@ -149,25 +150,26 @@ export function Navbar() {
           </div>
         </div>
       </nav>
+    </header>
 
-      {/* Modern Mobile Drawer */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <div className="fixed inset-0 top-[73px] z-40 lg:hidden">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="absolute inset-0 bg-gray-950/20 backdrop-blur-sm"
-            />
-            
-            <motion.div
-              initial={{ y: -20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -20, opacity: 0 }}
-              className="absolute inset-x-4 top-0 bg-white dark:bg-gray-950 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl overflow-y-auto p-6 flex flex-col"
-            >
+    {/* Modern Mobile Drawer */}
+    <AnimatePresence>
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 top-[73px] z-50 xl:hidden">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="absolute inset-0 bg-gray-950/20 backdrop-blur-sm"
+          />
+          
+          <motion.div
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -20, opacity: 0 }}
+            className="absolute inset-x-4 top-0 bg-white dark:bg-gray-950 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl overflow-y-auto p-6 flex flex-col"
+          >
               <div className="space-y-6 flex-1">
                 {/* Mobile User Section */}
                 {isAuthenticated && (
@@ -227,6 +229,6 @@ export function Navbar() {
           </div>
         )}
       </AnimatePresence>
-    </header>
+    </>
   );
 }
