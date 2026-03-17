@@ -53,18 +53,18 @@ export function Navbar() {
             href="/"
             className="flex items-center gap-2 sm:gap-3 group shrink-0"
           >
-            <div className="relative">
-              <div className="absolute -inset-1 bg-linear-to-r from-primary to-blue-600 rounded-lg blur opacity-10 group-hover:opacity-30 transition duration-500" />
+            <div className="relative group">
+              <div className="absolute -inset-2 bg-linear-to-r from-primary to-blue-600 rounded-full blur opacity-20 group-hover:opacity-40 transition duration-500" />
               <Image
                 src="/images/Ashwini SD.png"
-                alt="Logo"
-                width={36}
-                height={36}
-                className="relative w-8 h-8 sm:w-9 sm:h-9 object-contain grayscale-[0.5] group-hover:grayscale-0 transition-all duration-500"
+                alt="Ashwini SD Logo"
+                width={48}
+                height={48}
+                className="relative w-10 h-10 sm:w-12 sm:h-12 object-contain bg-white/10 p-1 rounded-lg group-hover:scale-110 transition-all duration-500"
               />
             </div>
-            <span className="text-lg sm:text-xl font-extrabold tracking-tighter text-gray-900 dark:text-white hidden xs:block">
-              Ashwini<span className="text-primary -translate-x-px inline-block">SD</span>
+            <span className="text-xl sm:text-2xl font-black tracking-tighter text-gray-900 dark:text-white">
+              Ashwini <span className="text-primary">SD</span>
             </span>
           </Link>
 
